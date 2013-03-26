@@ -1,0 +1,3 @@
+#!/bin/bash
+
+java -jar target/config-cloner-*-jar-with-dependencies.jar $*
