@@ -76,7 +76,7 @@ public class ConfigTransfer {
             final ConfigDestination destination
     ) throws IOException, GeneralSecurityException, InterruptedException {
 
-        final CLI service = new CLI(destination.host());
+        final CLI service = new CLI(destination.jenkins());
 
         final List<KeyPair> userKeys = userKeys();
 

@@ -10,18 +10,18 @@ import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "Clone node configuration from <SRC> to <DST>")
 public class CloneNode extends Handler {
-    
+
     @Parameter(description = "[<SRC>] [<DST>...]")
     private List<String> nodes;
 
     public CloneNode(final ConfigTransfer config) {
-        
+
         super(config);
     }
 
     @Override
     public CommandResponse run(final CommandResponse response) {
-        
+
         return null;
     }
 }

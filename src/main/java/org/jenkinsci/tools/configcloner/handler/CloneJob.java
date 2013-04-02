@@ -1,10 +1,14 @@
 package org.jenkinsci.tools.configcloner.handler;
 
+import java.net.URL;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
+import org.jenkinsci.tools.configcloner.UrlParser;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -43,19 +47,42 @@ public class CloneJob extends Handler {
 
         if (!destination().exists()) {
 
-            jobs.set(1, destination().host() + "/createItem?name=");
+            jobs.set(1, destination().jenkins() + "/createItem?name=");
         }
 
         return config.send(destination(), xml.stdout());
     }
 
-    private ConfigDestination source() {
+    /*package*/ ConfigDestination source() {
 
-        return ConfigDestination.parse(jobs.get(0));
+        return PARSER.destination(jobs.get(0));
     }
 
-    private ConfigDestination destination() {
+    /*package*/ ConfigDestination destination() {
 
-        return source().pair(jobs.get(1));
+        return PARSER.pair(source(), jobs.get(1));
     }
+
+    private static final UrlParser PARSER = new UrlParser() {
+
+        @Override
+        protected ConfigDestination parseDestination(final URL url) {
+
+            final Matcher urlMatcher = Pattern
+                    .compile("^(.*/?)((?:\\bview/.*?)?job/.*)$")
+                    .matcher(url.toString())
+            ;
+
+            if (!urlMatcher.matches()) return new ConfigDestination(url, "");
+
+            final String jenkins = urlMatcher.group(1);
+            String path = urlMatcher.group(2);
+            if (!path.endsWith("/config.xml")) {
+
+                path += "/config.xml";
+            }
+
+            return new ConfigDestination(jenkins, path);
+        }
+    };
 }

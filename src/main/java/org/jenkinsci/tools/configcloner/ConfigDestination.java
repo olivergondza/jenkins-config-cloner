@@ -4,76 +4,31 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.beust.jcommander.ParameterException;
-
 public class ConfigDestination {
 
-    private final String host;
+    private final String jenkins;
     private final String path;
 
-    public static ConfigDestination parse(final String urlCandidate) {
+    public ConfigDestination(final URL jenkins, final String path) {
 
-        final URL url = parseUrl(urlCandidate);
-
-        final String stringUrl = url.toString();
-
-        final int domainPos = stringUrl.indexOf(url.getHost());
-        final int endOfTheHost = stringUrl.indexOf('/', domainPos);
-        final String host = endOfTheHost == -1
-                ? stringUrl
-                : stringUrl.substring(0, endOfTheHost)
-        ;
-        return new ConfigDestination(host, url.getPath());
+        this(jenkins.toString(), path);
     }
 
-    public ConfigDestination(final String host, final String path) {
+    public ConfigDestination(final String jenkins, final String path) {
 
-        if (host == null || host.isEmpty()) throw new IllegalArgumentException(
+        if (jenkins == null || jenkins.isEmpty()) throw new IllegalArgumentException(
                 "Empty host provided"
         );
 
         if (path == null) throw new IllegalArgumentException("Empty path provided");
 
-        this.host = host;
+        this.jenkins = jenkins;
         this.path = path;
-    }
-
-    public ConfigDestination pair(final String urlCandidate) {
-
-        final ConfigDestination dest = _parseDest(urlCandidate);
-
-        if (dest.url().equals(url())) throw new ParameterException(
-                "Source and destination is the same url"
-        );
-
-        return dest;
-    }
-
-    private ConfigDestination _parseDest(final String urlCandidate) {
-
-        final URL url = parseUrl(urlCandidate);
-        final ConfigDestination dest = ConfigDestination.parse(urlCandidate);
-
-        // We have absolute path given
-        if (!url.getPath().isEmpty()) return dest;
-
-        return new ConfigDestination(dest.host().toString(), path());
     }
 
     public ConfigDestination newPath(final String path) {
 
-        return ConfigDestination.parse(host + path);
-    }
-
-    private static URL parseUrl(final String url) {
-
-        try {
-
-            return new URL(url);
-        } catch (final MalformedURLException ex) {
-
-            throw new ParameterException(ex);
-        }
+        return new ConfigDestination(jenkins, path);
     }
 
     public String path() {
@@ -83,12 +38,12 @@ public class ConfigDestination {
 
     public URL url() {
 
-        return getUrl(host + path);
+        return getUrl(jenkins + path);
     }
 
-    public URL host() {
+    public URL jenkins() {
 
-        return getUrl(host);
+        return getUrl(jenkins);
     }
 
     private static URL getUrl(final String url) {
@@ -112,5 +67,33 @@ public class ConfigDestination {
 
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + jenkins.hashCode();
+        result = 31 * result + path.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+
+        if (this == obj) return true;
+
+        if (obj == null) return false;
+
+        if (getClass() != obj.getClass()) return false;
+
+        final ConfigDestination other = (ConfigDestination) obj;
+
+        return this.path.equals(other.path) && this.jenkins.equals(other.jenkins);
+    }
+
+    @Override
+    public String toString() {
+
+        return jenkins().toString() + ":" + path();
     }
 }
