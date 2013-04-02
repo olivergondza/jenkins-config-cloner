@@ -1,8 +1,9 @@
-package org.jenkinsci.tools.remotecloner;
+package org.jenkinsci.tools.configcloner;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.testng.annotations.Test;
 import static org.testng.AssertJUnit.*;
 

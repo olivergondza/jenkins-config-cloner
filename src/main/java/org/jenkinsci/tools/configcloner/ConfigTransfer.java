@@ -1,4 +1,4 @@
-package org.jenkinsci.tools.remotecloner;
+package org.jenkinsci.tools.configcloner;
 
 import hudson.cli.CLI;
 
@@ -46,8 +46,7 @@ public class ConfigTransfer {
                 );
                 final CommandResponse.Accumulator response = this.response.accumulate();
 
-                service = new CLI(destination.host());
-                authenticate(service);
+                service = instantiateCli(destination);
                 final int ret = service.execute(COMMAND, in, response.out(), response.err());
 
                 return response.returnCode(ret);
@@ -73,13 +72,25 @@ public class ConfigTransfer {
         }
     }
 
-    private void authenticate(final CLI service) throws IOException, GeneralSecurityException {
+    private CLI instantiateCli(
+            final ConfigDestination destination
+    ) throws IOException, GeneralSecurityException, InterruptedException {
+
+        final CLI service = new CLI(destination.host());
 
         final List<KeyPair> userKeys = userKeys();
 
-        if (userKeys.isEmpty()) return;
+        if (!userKeys.isEmpty()) {
+
+            response.out().println("Authenticated access to " + destination.url());
+        } else {
+
+            response.out().println("Anonimous access to" + destination.url());
+        }
 
         service.authenticate(userKeys);
+
+        return service;
     }
 
     private List<KeyPair> userKeys() {

@@ -1,6 +1,6 @@
-package org.jenkinsci.tools.remotecloner.handler;
+package org.jenkinsci.tools.configcloner.handler;
 
-import org.jenkinsci.tools.remotecloner.CommandResponse;
+import org.jenkinsci.tools.configcloner.CommandResponse;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameters;

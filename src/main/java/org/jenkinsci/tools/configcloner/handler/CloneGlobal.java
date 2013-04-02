@@ -1,10 +1,10 @@
-package org.jenkinsci.tools.remotecloner.handler;
+package org.jenkinsci.tools.configcloner.handler;
 
 import java.util.List;
 
-import org.jenkinsci.tools.remotecloner.CommandResponse;
-import org.jenkinsci.tools.remotecloner.ConfigDestination;
-import org.jenkinsci.tools.remotecloner.ConfigTransfer;
+import org.jenkinsci.tools.configcloner.CommandResponse;
+import org.jenkinsci.tools.configcloner.ConfigDestination;
+import org.jenkinsci.tools.configcloner.ConfigTransfer;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;

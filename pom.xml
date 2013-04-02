@@ -75,7 +75,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.jenkinsci.tools.remotecloner.Main</mainClass>
+              <mainClass>org.jenkinsci.tools.configcloner.Main</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -85,7 +85,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.jenkinsci.tools.remotecloner.Main</mainClass>
+              <mainClass>org.jenkinsci.tools.configcloner.Main</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

@@ -1,4 +1,4 @@
-package org.jenkinsci.tools.remotecloner;
+package org.jenkinsci.tools.configcloner;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -13,7 +13,7 @@ public class ConfigDestination {
 
     public static ConfigDestination parse(final String urlCandidate) {
 
-        final URL url = getUrl(urlCandidate);
+        final URL url = parseUrl(urlCandidate);
 
         final String stringUrl = url.toString();
 
@@ -51,7 +51,7 @@ public class ConfigDestination {
 
     private ConfigDestination _parseDest(final String urlCandidate) {
 
-        final URL url = getUrl(urlCandidate);
+        final URL url = parseUrl(urlCandidate);
         final ConfigDestination dest = ConfigDestination.parse(urlCandidate);
 
         // We have absolute path given
@@ -65,21 +65,15 @@ public class ConfigDestination {
         return ConfigDestination.parse(host + path);
     }
 
-    private static URL getUrl(final String url) {
+    private static URL parseUrl(final String url) {
 
         try {
 
             return new URL(url);
         } catch (final MalformedURLException ex) {
 
-            ex.printStackTrace();
-            throw new AssertionError("Invalid URL " + url);
+            throw new ParameterException(ex);
         }
-    }
-
-    public URL host() {
-
-        return getUrl(host);
     }
 
     public String path() {
@@ -90,6 +84,22 @@ public class ConfigDestination {
     public URL url() {
 
         return getUrl(host + path);
+    }
+
+    public URL host() {
+
+        return getUrl(host);
+    }
+
+    private static URL getUrl(final String url) {
+
+        try {
+
+            return new URL(url);
+        } catch (final MalformedURLException ex) {
+
+            throw new AssertionError(ex);
+        }
     }
 
     public boolean exists() {

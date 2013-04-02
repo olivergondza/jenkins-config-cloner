@@ -1,4 +1,4 @@
-package org.jenkinsci.tools.remotecloner;
+package org.jenkinsci.tools.configcloner;
 
 public class HandlerException extends RuntimeException {
 

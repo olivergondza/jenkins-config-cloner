@@ -1,4 +1,4 @@
-package org.jenkinsci.tools.remotecloner;
+package org.jenkinsci.tools.configcloner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
