@@ -5,6 +5,11 @@ import java.net.URL;
 
 import com.beust.jcommander.ParameterException;
 
+/**
+ * Get Jenkins url and entity name from url
+ * 
+ * @author ogondza
+ */
 public abstract class UrlParser {
 
     protected abstract ConfigDestination parseDestination(final URL url);
@@ -14,6 +19,9 @@ public abstract class UrlParser {
         return parseDestination(validateUrl(stringUrl));
     }
 
+    /**
+     * Infer entity using base and url
+     */
     public ConfigDestination pair(
             final ConfigDestination base, final String urlCandidate
     ) {
@@ -33,10 +41,10 @@ public abstract class UrlParser {
 
         final ConfigDestination dest = destination(urlCandidate);
 
-        // We have absolute path given
-        if (!dest.path().isEmpty()) return dest;
+        // We have absolute iditifier
+        if (!dest.entity().isEmpty()) return dest;
 
-        return dest.newPath(base.path());
+        return dest.newEntity(base.entity());
     }
 
     public static URL validateUrl(final String url) {

@@ -14,11 +14,14 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "Clone job configuration from <SRC> to <DST>. Destination job will be either created or overwritten.")
+@Parameters(commandDescription = "Clone job configuration from <SRC> to <DST>")
 public class CloneJob extends Handler {
 
     @Parameter(description = "[<SRC>] [<DST>...]")
     private List<String> jobs;
+
+    @Parameter(names = {"--force", "-f"}, description = "Overwrite target job if exists")
+    private boolean force = false;
 
     public CloneJob(final ConfigTransfer config) {
 
@@ -36,23 +39,6 @@ public class CloneJob extends Handler {
         destination();
     }
 
-    @Override
-    public CommandResponse run(final CommandResponse response) {
-
-//        if (!source().exists()) throw new ParameterException(
-//                "Source url does not exists"
-//        );
-
-        final CommandResponse.Accumulator xml = config.fetch(source());
-
-        if (!destination().exists()) {
-
-            jobs.set(1, destination().jenkins() + "/createItem?name=");
-        }
-
-        return config.send(destination(), xml.stdout());
-    }
-
     /*package*/ ConfigDestination source() {
 
         return PARSER.destination(jobs.get(0));
@@ -63,26 +49,50 @@ public class CloneJob extends Handler {
         return PARSER.pair(source(), jobs.get(1));
     }
 
+    @Override
+    public CommandResponse run(final CommandResponse response) {
+
+        response.out().println("Fetching " + source());
+        final CommandResponse.Accumulator xml = config.execute(
+                source(), "", "get-job", source().entity()
+        );
+
+        if (!xml.succeeded()) return response.merge(xml);
+
+        final String destJob = destination().entity();
+
+        response.out().println("Sending " + destination());
+        
+        if (force) {
+
+            final CommandResponse.Accumulator rsp = config.execute(
+                    destination(), xml.stdout(), "update-job", destJob
+            );
+
+            if (rsp.succeeded()) return response.returnCode(0);
+        }
+        
+        return response.merge(
+                config.execute(destination(), xml.stdout(), "create-job", destJob)
+        );
+    }
+    
     private static final UrlParser PARSER = new UrlParser() {
 
         @Override
         protected ConfigDestination parseDestination(final URL url) {
 
             final Matcher urlMatcher = Pattern
-                    .compile("^(.*/?)((?:\\bview/.*?)?job/.*)$")
+                    .compile("^(.*?/)(?:view/[^/]+/)*job/([^/]+).*")
                     .matcher(url.toString())
             ;
 
             if (!urlMatcher.matches()) return new ConfigDestination(url, "");
 
             final String jenkins = urlMatcher.group(1);
-            String path = urlMatcher.group(2);
-            if (!path.endsWith("/config.xml")) {
-
-                path += "/config.xml";
-            }
-
-            return new ConfigDestination(jenkins, path);
+            String entity = urlMatcher.group(2);
+            
+            return new ConfigDestination(jenkins, entity);
         }
     };
 }

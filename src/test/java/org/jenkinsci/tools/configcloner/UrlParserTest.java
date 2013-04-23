@@ -15,7 +15,7 @@ public class UrlParserTest {
   public void sameInstanceShouldBeDisallowed() throws MalformedURLException, ParameterException {
 
       final ConfigDestination from = new ConfigDestination(
-              "http://localhost:8080", "/job/my-job/"
+              "http://localhost:8080", "my-job"
       );
 
       constParser(from).pair(from, "http://localhost:8080");
@@ -25,14 +25,13 @@ public class UrlParserTest {
   public void completePathFromSourceWhenMissingInDestination() throws MalformedURLException {
 
       final ConfigDestination from = new ConfigDestination(
-              "http://localhost:8080", "/job/my-job"
+              "http://localhost:8080", "my-job"
       );
 
       final ConfigDestination to = constParser("http://localhost:4242", "").pair(from, "http://ignored:4242");
 
       assertEquals(new URL("http://localhost:4242"), to.jenkins());
-      assertEquals("/job/my-job", to.path());
-      assertEquals(new URL("http://localhost:4242/job/my-job"), to.url());
+      assertEquals("my-job", to.entity());
   }
 
   private UrlParser constParser(final String jenkins, final String path) {

@@ -59,8 +59,26 @@ public class CloneJobTest extends Abstract {
     public Object[][] validArgs() {
 
         return new Object[][][] {
-                map("http://1.jnk.ns/job/a", "http://2.jnk.ns/")
-                .to(dest("http://1.jnk.ns/", "job/a/config.xml"), dest("http://2.jnk.ns/", "job/a/config.xml")),
+                map("http://1.jnk.ns/job/a", "http://2.jnk.ns/").to(
+                        dest("http://1.jnk.ns/", "a"),
+                        dest("http://2.jnk.ns/", "a")
+                ),
+                map("http://1.jnk.ns/job/a/", "http://2.jnk.ns/job/b").to(
+                        dest("http://1.jnk.ns/", "a"),
+                        dest("http://2.jnk.ns/", "b")
+                ),
+                map("http://1.jnk.ns/job/a/config.xml", "http://2.jnk.ns/").to(
+                        dest("http://1.jnk.ns/", "a"),
+                        dest("http://2.jnk.ns/", "a")
+                ),
+                map("http://1.jnk.ns/view/someview/job/a/config.xml", "http://2.jnk.ns/").to(
+                        dest("http://1.jnk.ns/", "a"),
+                        dest("http://2.jnk.ns/", "a")
+                ),
+                map("http://1.jnk.ns/view/someview/job/a/config.xml", "http://2.jnk.ns/view/v/job/c/").to(
+                        dest("http://1.jnk.ns/", "a"),
+                        dest("http://2.jnk.ns/", "c")
+                ),
         };
     }
 

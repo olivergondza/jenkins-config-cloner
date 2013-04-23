@@ -37,6 +37,6 @@ public class CloneGlobal extends Handler {
     @Override
     public CommandResponse run(final CommandResponse response) {
 
-        return config.fetch(source);
+        return null;
     }
 }

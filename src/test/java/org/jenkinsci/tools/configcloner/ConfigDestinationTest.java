@@ -10,21 +10,14 @@ import static org.testng.AssertJUnit.*;
 public class ConfigDestinationTest {
 
   @Test
-  public void newPathShouldShareTheHost() throws MalformedURLException {
+  public void newDestinationShouldShareTheHost() throws MalformedURLException {
 
       final ConfigDestination old = new ConfigDestination(
-              "http://localhost:8080", "/job/my-job"
+              "http://localhost:8080", "my-slave"
       );
 
-      final ConfigDestination derived = old.newPath("/node/computer/master");
+      final ConfigDestination derived = old.newEntity("master");
 
-      assertEquals(new URL("http://localhost:8080/node/computer/master"), derived.url());
-  }
-
-  @Test
-  public void exists() {
-
-      assertTrue(new ConfigDestination("http://www.google.com", "/").exists());
-      assertFalse(new ConfigDestination("http://there.is.no.such.domain", "/and/url").exists());
+      assertEquals(new ConfigDestination("http://localhost:8080", "master"), derived);
   }
 }

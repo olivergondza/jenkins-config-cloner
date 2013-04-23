@@ -1,17 +1,16 @@
 package org.jenkinsci.tools.configcloner;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ConfigDestination {
 
     private final String jenkins;
-    private final String path;
+    private final String entity;
 
-    public ConfigDestination(final URL jenkins, final String path) {
+    public ConfigDestination(final URL jenkins, final String entity) {
 
-        this(jenkins.toString(), path);
+        this(jenkins.toString(), entity);
     }
 
     public ConfigDestination(final String jenkins, final String path) {
@@ -23,24 +22,19 @@ public class ConfigDestination {
         if (path == null) throw new IllegalArgumentException("Empty path provided");
 
         this.jenkins = jenkins;
-        this.path = path;
+        this.entity = path;
     }
 
-    public ConfigDestination newPath(final String path) {
+    public ConfigDestination newEntity(final String entity) {
 
-        return new ConfigDestination(jenkins, path);
+        return new ConfigDestination(jenkins, entity);
     }
 
-    public String path() {
+    public String entity() {
 
-        return path;
+        return entity;
     }
-
-    public URL url() {
-
-        return getUrl(jenkins + path);
-    }
-
+    
     public URL jenkins() {
 
         return getUrl(jenkins);
@@ -57,23 +51,11 @@ public class ConfigDestination {
         }
     }
 
-    public boolean exists() {
-
-        try {
-
-            url().openStream();
-            return true;
-        } catch (final IOException ex) {
-
-            return false;
-        }
-    }
-
     @Override
     public int hashCode() {
         int result = 17;
         result = 31 * result + jenkins.hashCode();
-        result = 31 * result + path.hashCode();
+        result = 31 * result + entity.hashCode();
         return result;
     }
 
@@ -88,12 +70,12 @@ public class ConfigDestination {
 
         final ConfigDestination other = (ConfigDestination) obj;
 
-        return this.path.equals(other.path) && this.jenkins.equals(other.jenkins);
+        return this.entity.equals(other.entity) && this.jenkins.equals(other.jenkins);
     }
 
     @Override
     public String toString() {
 
-        return jenkins().toString() + ":" + path();
+        return jenkins().toString() + ":" + entity();
     }
 }

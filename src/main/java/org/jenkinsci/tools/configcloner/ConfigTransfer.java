@@ -1,11 +1,12 @@
 package org.jenkinsci.tools.configcloner;
 
 import hudson.cli.CLI;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.util.ArrayList;
@@ -14,8 +15,7 @@ import java.util.List;
 
 public class ConfigTransfer {
 
-    private static final String[] KEY_FILES = {".ssh/id_rsa", ".ssh/id_dsa", ".ssh/identity"};
-    private static final List<String> COMMAND = Arrays.asList("groovy", "=");
+    private static final String[] KEY_FILES = {".ssh/identity", ".ssh/id_rsa", ".ssh/id_dsa"};
 
     private final CommandResponse response;
 
@@ -24,17 +24,11 @@ public class ConfigTransfer {
         this.response = response;
     }
 
-    public CommandResponse.Accumulator fetch(final ConfigDestination source) {
-
-        return execute(source, "println new URL(\"%s\").getContent();");
-    }
-
-    public CommandResponse.Accumulator send(final ConfigDestination destination, final String content) {
-
-        return execute(destination, "println new URL(\"%s\").getContent();");
-    }
-
-    private CommandResponse.Accumulator execute(final ConfigDestination destination, final String stdin) {
+    public CommandResponse.Accumulator execute(
+            final ConfigDestination destination,
+            final String stdin,
+            final String... command
+    ) {
 
         try {
 
@@ -42,13 +36,12 @@ public class ConfigTransfer {
             try {
 
                 final ByteArrayInputStream in = new ByteArrayInputStream(
-                        String.format(stdin, destination.url()).getBytes("UTF-8")
+                        stdin.getBytes("UTF-8")
                 );
                 final CommandResponse.Accumulator response = this.response.accumulate();
 
                 service = instantiateCli(destination);
-                final int ret = service.execute(COMMAND, in, response.out(), response.err());
-
+                final int ret = service.execute(Arrays.asList(command), in, response.out(), response.err());
                 return response.returnCode(ret);
             } finally {
 
@@ -80,12 +73,9 @@ public class ConfigTransfer {
 
         final List<KeyPair> userKeys = userKeys();
 
-        if (!userKeys.isEmpty()) {
+        if (userKeys.isEmpty()) {
 
-            response.out().println("Authenticated access to " + destination.url());
-        } else {
-
-            response.out().println("Anonimous access to" + destination.url());
+            System.out.println("Anonimous access");
         }
 
         service.authenticate(userKeys);
@@ -98,23 +88,55 @@ public class ConfigTransfer {
         final List<KeyPair> pairs = new ArrayList<KeyPair>(3);
 
         final File home = new File(System.getProperty("user.home"));
-        for (final String path : KEY_FILES) {
+        for (final String path: KEY_FILES) {
+
 
             final File key = new File(home, path);
             if (!key.exists()) continue;
-
+            
             try {
-
+                
                 pairs.add(CLI.loadKey(key));
-            } catch (final IOException ex) {
-
+            } catch (IOException ex) {
+            
+                //if the PEM file is encrypted, IOException is thrown
+                pairs.add(tryEncryptedFile(key));
+            } catch (GeneralSecurityException ex) {
+                
                 System.err.println("Failed to load " + key);
-            } catch (final GeneralSecurityException ex) {
-
-                System.err.println("Failed to load " + key);
+                System.err.println(ex.getMessage());
+                ex.printStackTrace();
             }
         }
 
         return pairs;
+    }
+
+    /**
+     * Call private CLI.tryEncryptedFile
+     */
+    private KeyPair tryEncryptedFile(final File key) {
+        
+        try {
+
+            Method m = CLI.class.getDeclaredMethod("tryEncryptedFile", File.class);
+            m.setAccessible(true);
+            return (KeyPair) m.invoke(key, key);
+        } catch (IllegalArgumentException ex) {
+            
+            throw new AssertionError(ex);
+        } catch (IllegalAccessException ex) {
+
+            throw new AssertionError(ex);
+        } catch (InvocationTargetException ex) {
+
+            throw new AssertionError(ex);
+        } catch (SecurityException ex) {
+
+            throw new AssertionError(ex);
+        } catch (NoSuchMethodException ex) {
+
+            throw new AssertionError(ex);
+        }
     }
 }

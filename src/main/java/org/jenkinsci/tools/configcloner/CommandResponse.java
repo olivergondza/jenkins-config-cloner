@@ -2,6 +2,7 @@ package org.jenkinsci.tools.configcloner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 
 public class CommandResponse {
 
@@ -19,11 +20,6 @@ public class CommandResponse {
         this.errorStream = err;
     }
 
-    private static PrintStream emptyStream() {
-
-        return new PrintStream(new ByteArrayOutputStream());
-    }
-
     public CommandResponse returnCode(final int ret) {
 
         returnCode = ret;
@@ -33,6 +29,11 @@ public class CommandResponse {
     public int returnCode() {
 
         return returnCode;
+    }
+    
+    public boolean succeeded() {
+        
+        return returnCode() == 0;
     }
 
     public PrintStream out() {
@@ -45,22 +46,86 @@ public class CommandResponse {
         return errorStream;
     }
 
-    public Accumulator accumulate() {
+    public static Accumulator accumulate() {
 
-        return new Accumulator(errorStream);
+        return new Accumulator(new ByteArrayOutputStream(), new ByteArrayOutputStream());
+    }
+    
+    public CommandResponse merge(final Accumulator response) {
+        
+        returnCode = response.returnCode();
+        outputStream.append(response.stdout());
+        errorStream.append(response.stderr());
+        
+        return this;
     }
 
     public static class Accumulator extends CommandResponse{
 
-        public Accumulator(final PrintStream err) {
+        final ByteArrayOutputStream out;
+        final ByteArrayOutputStream err;
 
-            super(emptyStream(), err);
+        public Accumulator(final ByteArrayOutputStream out, final ByteArrayOutputStream err) {
+
+            super(new PrintStream(out), new PrintStream(err));
+
+            this.out = out;
+            this.err = err;
         }
 
         public String stdout() {
 
-            out().close();
-            return out().toString();
+            return asString(out);
+        }
+
+        public String stdout(final String pattern) {
+
+            return decorate(out, pattern);
+        }
+
+        public String stderr() {
+
+            return asString(err);
+        }
+
+        public String stderr(final String pattern) {
+
+            return decorate(err, pattern);
+        }
+
+        public void dump(final String operation) {
+
+            System.out.println(operation + ": " + returnCode());
+            System.out.print(stdout("out > %s"));
+            System.err.print(stderr("err > %s"));
+        }
+
+        private String decorate(final ByteArrayOutputStream stream, String pattern) {
+
+            if (!pattern.endsWith("\n")) {
+
+                pattern += "\n";
+            }
+
+            final String in = asString(stream);
+            final StringBuilder builder = new StringBuilder(in.length());
+            for (final String line: asString(stream).split("\n")) {
+
+                builder.append(String.format(pattern, line));
+            }
+
+            return builder.toString();
+        }
+
+        private String asString(final ByteArrayOutputStream stream) {
+
+            try {
+
+                return stream.toString("UTF-8");
+            } catch (final UnsupportedEncodingException ex) {
+
+                throw new AssertionError(ex);
+            }
         }
 
         @Override
