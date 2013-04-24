@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import org.jenkinsci.tools.configcloner.Abstract;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
-import org.jenkinsci.tools.configcloner.handler.CloneJob;
 import org.mockito.Mockito;
 import org.powermock.reflect.Whitebox;
 import org.testng.annotations.DataProvider;
@@ -47,12 +46,13 @@ public class CloneJobTest extends Abstract {
     @Test(dataProvider = "validArgs")
     public void parseValidDestinations(final String[] args, final ConfigDestination[] dests) {
 
-        assert args.length == 2 && dests.length == 2;
-
         initialize(args);
 
         assertEquals(dests[0], handler.source());
-        assertEquals(dests[1], handler.destination());
+        assertEquals(
+                Arrays.asList(dests).subList(1, dests.length),
+                handler.destinations()
+        );
     }
 
     @DataProvider
@@ -78,6 +78,17 @@ public class CloneJobTest extends Abstract {
                 map("http://1.jnk.ns/view/someview/job/a/config.xml", "http://2.jnk.ns/view/v/job/c/").to(
                         dest("http://1.jnk.ns/", "a"),
                         dest("http://2.jnk.ns/", "c")
+                ),
+
+                map("http://1.jnk.ns/jenkins/job/jobname", "http://2.jnk.ns/infra/hudson/view/v/job/name/config.xml").to(
+                        dest("http://1.jnk.ns/jenkins/", "jobname"),
+                        dest("http://2.jnk.ns/infra/hudson/", "name")
+                ),
+
+                map("http://1.jnk.ns/job/src", "http://2.jnk.ns/job/dst1", "http://3.jnk.ns/job/dst2").to(
+                        dest("http://1.jnk.ns/", "src"),
+                        dest("http://2.jnk.ns/", "dst1"),
+                        dest("http://3.jnk.ns/", "dst2")
                 ),
         };
     }

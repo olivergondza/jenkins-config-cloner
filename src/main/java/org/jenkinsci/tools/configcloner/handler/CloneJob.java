@@ -31,12 +31,12 @@ public class CloneJob extends Handler {
     @Override
     public void validate() {
 
-        if (jobs == null || jobs.size() != 2) throw new ParameterException(
-                "Expecting 2 positional arguments"
+        if (jobs == null || jobs.size() < 2) throw new ParameterException(
+                "Expecting 2 or more positional arguments"
         );
 
         // Instantiates both destinations
-        destination();
+        destinations();
     }
 
     /*package*/ ConfigDestination source() {
@@ -44,9 +44,9 @@ public class CloneJob extends Handler {
         return PARSER.destination(jobs.get(0));
     }
 
-    /*package*/ ConfigDestination destination() {
+    /*package*/ List<ConfigDestination> destinations() {
 
-        return PARSER.pair(source(), jobs.get(1));
+        return PARSER.pair(source(), jobs.subList(1, jobs.size()));
     }
 
     @Override
@@ -59,24 +59,37 @@ public class CloneJob extends Handler {
 
         if (!xml.succeeded()) return response.merge(xml);
 
-        final String destJob = destination().entity();
+        for (final ConfigDestination dest: destinations()) {
 
-        response.out().println("Sending " + destination());
-        
+            response.out().println("Sending " + dest);
+            send(dest, response, xml);
+        }
+
+        return response;
+    }
+
+    private CommandResponse send(
+            final ConfigDestination destination,
+            final CommandResponse response,
+            final CommandResponse.Accumulator xml
+    ) {
+
+        final String destJob = destination.entity();
+
         if (force) {
 
             final CommandResponse.Accumulator rsp = config.execute(
-                    destination(), xml.stdout(), "update-job", destJob
+                    destination, xml.stdout(), "update-job", destJob
             );
 
             if (rsp.succeeded()) return response.returnCode(0);
         }
-        
+
         return response.merge(
-                config.execute(destination(), xml.stdout(), "create-job", destJob)
+                config.execute(destination, xml.stdout(), "create-job", destJob)
         );
     }
-    
+
     private static final UrlParser PARSER = new UrlParser() {
 
         @Override
@@ -91,7 +104,7 @@ public class CloneJob extends Handler {
 
             final String jenkins = urlMatcher.group(1);
             String entity = urlMatcher.group(2);
-            
+
             return new ConfigDestination(jenkins, entity);
         }
     };

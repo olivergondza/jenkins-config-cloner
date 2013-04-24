@@ -2,10 +2,12 @@ package org.jenkinsci.tools.configcloner.handler;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import org.jenkinsci.tools.configcloner.CommandResponse;
+import org.jenkinsci.tools.configcloner.CommandResponse.Accumulator;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
-import org.jenkinsci.tools.configcloner.CommandResponse.Accumulator;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.testng.annotations.BeforeMethod;
@@ -32,7 +34,7 @@ public class CloneJobRunTest {
         responseFetch.out().append("job-configuration");
 
         Mockito.doReturn(source).when(handler).source();
-        Mockito.doReturn(destination).when(handler).destination();
+        Mockito.doReturn(Arrays.asList(destination)).when(handler).destinations();
 
         Mockito.doReturn(responseFetch).when(config).execute(source, "", "get-job", source.entity());
         Mockito.doReturn(responseCreate).when(config).execute(destination, "job-configuration", "create-job", destination.entity());

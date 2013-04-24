@@ -4,6 +4,8 @@ import static org.testng.AssertJUnit.assertEquals;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import org.testng.annotations.Test;
 
@@ -18,7 +20,7 @@ public class UrlParserTest {
               "http://localhost:8080", "my-job"
       );
 
-      constParser(from).pair(from, "http://localhost:8080");
+      constParser(from).pair(from, Arrays.asList("http://localhost:8080"));
   }
 
   @Test
@@ -28,7 +30,10 @@ public class UrlParserTest {
               "http://localhost:8080", "my-job"
       );
 
-      final ConfigDestination to = constParser("http://localhost:4242", "").pair(from, "http://ignored:4242");
+      final ConfigDestination to = constParser("http://localhost:4242", "")
+              .pair(from, Arrays.asList("http://ignored:4242"))
+              .get(0)
+      ;
 
       assertEquals(new URL("http://localhost:4242"), to.jenkins());
       assertEquals("my-job", to.entity());

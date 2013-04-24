@@ -2,12 +2,14 @@ package org.jenkinsci.tools.configcloner;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.beust.jcommander.ParameterException;
 
 /**
  * Get Jenkins url and entity name from url
- * 
+ *
  * @author ogondza
  */
 public abstract class UrlParser {
@@ -22,17 +24,23 @@ public abstract class UrlParser {
     /**
      * Infer entity using base and url
      */
-    public ConfigDestination pair(
-            final ConfigDestination base, final String urlCandidate
+    public List<ConfigDestination> pair(
+            final ConfigDestination base, final List<String> urlCandidates
     ) {
 
-        final ConfigDestination dest = _parseDest(base, urlCandidate);
+        final List<ConfigDestination> urls = new ArrayList<ConfigDestination>(urlCandidates.size());
+        for (final String url: urlCandidates) {
 
-        if (dest.equals(base)) throw new ParameterException(
-                "Source and destination is the same url"
-        );
+            final ConfigDestination dest = _parseDest(base, url);
 
-        return dest;
+            if (dest.equals(base)) throw new ParameterException(
+                    "Source and destination is the same url"
+            );
+
+            urls.add(dest);
+        }
+
+        return urls;
     }
 
     private ConfigDestination _parseDest(
