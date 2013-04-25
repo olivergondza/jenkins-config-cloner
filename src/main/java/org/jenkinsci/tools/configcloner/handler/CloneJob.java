@@ -35,7 +35,7 @@ public class CloneJob extends Handler {
                 "Expecting 2 or more positional arguments"
         );
 
-        // Instantiates both destinations
+        // Instantiates all destinations
         destinations();
     }
 

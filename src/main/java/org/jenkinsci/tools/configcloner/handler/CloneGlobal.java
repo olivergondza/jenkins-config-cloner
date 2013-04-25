@@ -2,15 +2,15 @@ package org.jenkinsci.tools.configcloner.handler;
 
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "Clone global configuration")
+@Parameters(commandDescription = "Clone global configuration. NOT IMPLEMENTED.")
 public class CloneGlobal extends Handler {
 
     @Parameter(description = "[<SRC>] [<DST>...]")
@@ -24,19 +24,8 @@ public class CloneGlobal extends Handler {
     }
 
     @Override
-    public void validate() {
-
-        if (jobs == null || jobs.size() != 2) throw new ParameterException(
-                "Expecting 2 positional arguments"
-        );
-
-        //source = ConfigDestination.parse(jobs.get(0));
-        //destination = source.pair(jobs.get(1));
-    }
-
-    @Override
     public CommandResponse run(final CommandResponse response) {
 
-        return null;
+        throw new NotImplementedException();
     }
 }

@@ -2,13 +2,14 @@ package org.jenkinsci.tools.configcloner.handler;
 
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "Clone node configuration from <SRC> to <DST>")
+@Parameters(commandDescription = "Clone node configuration. NOT IMPLEMENTED.")
 public class CloneNode extends Handler {
 
     @Parameter(description = "[<SRC>] [<DST>...]")
@@ -22,6 +23,6 @@ public class CloneNode extends Handler {
     @Override
     public CommandResponse run(final CommandResponse response) {
 
-        return null;
+        throw new NotImplementedException();
     }
 }
