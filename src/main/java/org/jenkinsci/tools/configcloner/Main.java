@@ -20,7 +20,10 @@ public class Main {
     private final Handler usage = new Usage(commander);
     private static final Map<String, Handler> commandMapping = new HashMap<String, Handler>();
     {
-        final ConfigTransfer config = new ConfigTransfer(new CommandResponse(System.out, System.err));
+        final ConfigTransfer config = new ConfigTransfer(
+                new CommandResponse(System.out, System.err),
+                new CLIPool()
+        );
 
         addCommand(  "help", usage);
         addCommand("global", new CloneGlobal(config));
