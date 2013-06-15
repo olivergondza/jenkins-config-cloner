@@ -1,5 +1,7 @@
 package org.jenkinsci.tools.configcloner.handler;
 
+import static org.jenkinsci.tools.configcloner.handler.Helper.dest;
+import static org.jenkinsci.tools.configcloner.handler.Helper.map;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -97,34 +99,5 @@ public class CloneJobTest extends Abstract {
 
         Whitebox.setInternalState(handler, "jobs", args == null ? null : Arrays.asList(args));
         handler.validate();
-    }
-
-    private ConfigDestination dest(final String jenkins, final String path) {
-
-        return new ConfigDestination(jenkins, path);
-    }
-
-    private Mapping map(final String... args) {
-
-        return new Mapping(args);
-    }
-
-    private static class Mapping {
-
-        private final String[] from;
-
-        public Mapping(final String... args) {
-
-            from = args;
-        }
-
-        public Object[][] to(final ConfigDestination... to) {
-
-            assert from.length == to.length;
-
-            return new Object[][] {
-                    from, to
-            };
-        }
     }
 }
