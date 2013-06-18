@@ -32,4 +32,4 @@ Clone `my-great-job` from `jenkins-old` to `jenkins-new/ci` with the same name a
 
 Likewise for nodes
 
-	$ ./clone job http://jenkins.old/computer/my-slave http://jenkins.new/ci/ http://jenkins.pub/computer/my-cloned-slave
+	$ ./clone node http://jenkins.old/computer/my-slave http://jenkins.new/ci/ http://jenkins.pub/computer/my-cloned-slave
