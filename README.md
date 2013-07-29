@@ -4,10 +4,13 @@
 
 - Bash and Java to run. GIT and Maven to build.
 - This permissions needs to be granted to either anonymous user or the user authenticated using [public key](https://wiki.jenkins-ci.org/display/JENKINS/Jenkins+CLI#JenkinsCLI-WorkingwithCredentials).
+  - Jenkins.READ as a minimum to call remote CLI commands
   - Item.EXTENDED_READ to read jobs from source instance
   - Item.CREATE to create jobs on target instance
   - Item.CONFIGURE to update existing job on target instance
-  - Jenkins.ADMINISTER to manipulate nodes
+  - Computer.READ to read node config from source instance
+  - Computer.CREATE to create nodes on target instance
+  - Computer.CONFIGURE to update nodes on target instance
 
 ### Authentication
 
