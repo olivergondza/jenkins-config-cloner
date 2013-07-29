@@ -18,11 +18,11 @@ public class Main {
     private final CommandResponse response;
     private final JCommander commander = new JCommander();
     private final Handler usage = new Usage(commander);
+    private final CLIPool cliPool = new CLIPool();
     private static final Map<String, Handler> commandMapping = new HashMap<String, Handler>();
     {
         final ConfigTransfer config = new ConfigTransfer(
-                new CommandResponse(System.out, System.err),
-                new CLIPool()
+                new CommandResponse(System.out, System.err), cliPool
         );
 
         addCommand(  "help", usage);
@@ -81,6 +81,7 @@ public class Main {
                 "null response from " + handler.toString()
         );
 
+        cliPool.close();
         return response;
     }
 
