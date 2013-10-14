@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.jenkinsci.tools.configcloner.handler.CloneGlobal;
 import org.jenkinsci.tools.configcloner.handler.CloneJob;
+import org.jenkinsci.tools.configcloner.handler.CloneView;
 import org.jenkinsci.tools.configcloner.handler.CloneNode;
 import org.jenkinsci.tools.configcloner.handler.Handler;
 import org.jenkinsci.tools.configcloner.handler.InvalidUsage;
@@ -26,9 +27,10 @@ public class Main {
         );
 
         addCommand(  "help", usage);
-        addCommand("global", new CloneGlobal(config));
         addCommand(   "job", new CloneJob(config));
+        addCommand(  "view", new CloneView(config));
         addCommand(  "node", new CloneNode(config));
+        addCommand("global", new CloneGlobal(config));
     }
 
     private void addCommand(final String name, final Handler handler) {
