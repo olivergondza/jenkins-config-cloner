@@ -11,6 +11,9 @@
   - Computer.READ to read node config from source instance
   - Computer.CREATE to create nodes on target instance
   - Computer.CONFIGURE to update nodes on target instance
+  - View.READ to read view config from source instance
+  - View.CREATE to create views on target instance
+  - View.CONFIGURE to update views on target instance
 
 ### Authentication
 
