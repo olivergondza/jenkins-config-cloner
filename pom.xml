@@ -19,6 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <surefire.useFile>false</surefire.useFile>
     <jenkins.version>1.480</jenkins.version>
+    <surefire.version>2.13</surefire.version>
   </properties>
 
   <dependencies>
@@ -47,6 +48,19 @@
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
       <version>1.30</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.main</groupId>
+      <artifactId>jenkins-test-harness</artifactId>
+      <version>${jenkins.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.modules</groupId>
+      <artifactId>ssh-cli-auth</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -141,6 +155,24 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- run junit and testng together -->
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-junit47</artifactId>
+            <version>${surefire.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-testng</artifactId>
+            <version>${surefire.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>

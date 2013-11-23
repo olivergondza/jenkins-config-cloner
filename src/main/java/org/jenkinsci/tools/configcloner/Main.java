@@ -42,9 +42,32 @@ public class Main {
     private final CommandResponse response;
     private final JCommander commander = new JCommander();
     private final Handler usage = new Usage(commander);
-    private final CLIPool cliPool = new CLIPool();
-    private static final Map<String, Handler> commandMapping = new HashMap<String, Handler>();
-    {
+    private final CLIPool cliPool;
+    private final Map<String, Handler> commandMapping = new HashMap<String, Handler>();
+
+    public static void main(final String[] args) {
+
+        final CommandResponse resp = new CommandResponse(System.out, System.err);
+        final CommandResponse response = new Main(resp).run(args);
+
+        System.exit(response.returnCode());
+    }
+
+    public Main(final CommandResponse response) {
+
+        this(response, new CLIPool());
+    }
+
+    public Main(CommandResponse response, CLIPool cliPool) {
+        commander.setProgramName("remote-cloner");
+
+        this.response = response;
+        this.cliPool = cliPool;
+        setupMapping(cliPool);
+    }
+
+    private void setupMapping(CLIPool cliPool) {
+
         final ConfigTransfer config = new ConfigTransfer(
                 new CommandResponse(System.out, System.err), cliPool
         );
@@ -60,21 +83,6 @@ public class Main {
 
         commandMapping.put(name, handler);
         commander.addCommand(name, handler);
-    }
-
-    public static void main(final String[] args) {
-
-        final CommandResponse resp = new CommandResponse(System.out, System.err);
-        final CommandResponse response = new Main(resp).run(args);
-
-        System.exit(response.returnCode());
-    }
-
-    public Main(final CommandResponse response) {
-
-        commander.setProgramName("remote-cloner");
-
-        this.response = response;
     }
 
     public CommandResponse run(final String... args) {
