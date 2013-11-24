@@ -28,14 +28,17 @@ Get and build:
 	$ git clone git://github.com/olivergondza/jenkins-config-cloner.git
 	$ mvn package
 
-Get help:
+There is a convenient wrapper called `clone.sh` to invoke `target/config-cloner-${VERSION}-jar-with-dependencies.jar`
+in a comfortable way: `./clone.sh help`.
 
-	$ ./clone help
+
+All the commands have the same pattern `clone.sh TYPE SRC_ITEM DST_ITEM...`. `TYPE` identifies the type of item to clone
+(`job`, `node` etc.). For the convenience items are identified with their URLs.
 
 Clone `my-great-job` from `jenkins-old` to `jenkins-new/ci` with the same name and to`jenkins-pub` having new name `my-great-job-pub`:
 
-	$ ./clone job http://jenkins.old/job/my-great-job http://jenkins.new/ci/ http://jenkins.pub/job/my-great-job-pub
+	$ ./clone.sh job http://jenkins.old/job/my-great-job http://jenkins.new/ci/ http://jenkins.pub/job/my-great-job-pub
 
 Likewise for nodes
 
-	$ ./clone node http://jenkins.old/computer/my-slave http://jenkins.new/ci/ http://jenkins.pub/computer/my-cloned-slave
+	$ ./clone.sh node http://jenkins.old/computer/my-slave http://jenkins.new/ci/ http://jenkins.pub/computer/cloned-slave
