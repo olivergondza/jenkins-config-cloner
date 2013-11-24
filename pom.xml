@@ -18,7 +18,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <surefire.useFile>false</surefire.useFile>
-    <jenkins.version>1.532</jenkins.version>
+    <jenkins.version>1.538</jenkins.version>
     <surefire.version>2.13</surefire.version>
   </properties>
 
@@ -49,6 +49,12 @@
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>jenkins-test-harness</artifactId>
       <version>${jenkins.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>nested-view</artifactId>
+      <version>1.14</version>
       <scope>test</scope>
     </dependency>
     <dependency>
