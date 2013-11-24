@@ -29,9 +29,10 @@ public class CloneJobIntegrationTest {
 
         createFreeStyle("sourceJob", "Job Description");
 
-        assertTrue(command.invoke("job/sourceJob/", "job/destJob/").succeeded());
+        assertTrue(command.invoke("job/sourceJob/", "job/destJob1/", "job/destJob2/").succeeded());
 
-        assertHasDescription("destJob", "Job Description");
+        assertHasDescription("destJob1", "Job Description");
+        assertHasDescription("destJob2", "Job Description");
     }
 
     @Test
