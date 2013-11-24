@@ -46,7 +46,7 @@ public class CloneJobIntegrationTest {
     }
 
     @Test
-    public void AbortCloningSinceTheDestinationAlreadyExists() {
+    public void abortCloningSinceTheDestinationAlreadyExists() {
 
         createFreeStyle("sourceJob", "Job Description");
         createFreeStyle("destJob", "Description not to be overwriten");
@@ -57,7 +57,7 @@ public class CloneJobIntegrationTest {
     }
 
     @Test
-    public void AbortCloningIfSourceDoesNotExist() {
+    public void abortCloningIfSourceDoesNotExist() {
 
         createFreeStyle("destJob", "Description not to be overwriten");
 

@@ -25,7 +25,6 @@ package org.jenkinsci.tools.configcloner.handler;
 
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
@@ -49,6 +48,6 @@ public class CloneGlobal extends Handler {
     @Override
     public CommandResponse run(final CommandResponse response) {
 
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }

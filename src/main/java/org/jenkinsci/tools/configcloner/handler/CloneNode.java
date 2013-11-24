@@ -97,19 +97,27 @@ public class CloneNode extends Handler {
             final CommandResponse.Accumulator xml
     ) {
 
-        final String destJob = destination.entity();
+        final String destNode = destination.entity();
 
         if (force) {
 
+            // Node XML contains a name so update performs node renaming as well.
+            // Use destination name in case it differs from source node name.
+            // TODO add an option to CloneNodeCommand to suppress that behavior.
+            String nodeXml = xml.stdout().replaceFirst(
+                    "<name>.*?</name>",
+                    "<name>" + destNode + "</name>"
+            );
+
             final CommandResponse.Accumulator rsp = config.execute(
-                    destination, xml.stdout(), "update-node", destJob
+                    destination, nodeXml, "update-node", destNode
             );
 
             if (rsp.succeeded()) return response.returnCode(0);
         }
 
         return response.merge(
-                config.execute(destination, xml.stdout(), "create-node", destJob)
+                config.execute(destination, xml.stdout(), "create-node", destNode)
         );
     }
 

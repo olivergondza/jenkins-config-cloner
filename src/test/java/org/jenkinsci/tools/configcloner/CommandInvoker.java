@@ -2,7 +2,9 @@ package org.jenkinsci.tools.configcloner;
 
 import hudson.model.User;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -16,6 +18,9 @@ import java.util.List;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 
 public class CommandInvoker {
+
+    private final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
 
     private final URL url;
     private final String kind;
@@ -43,7 +48,9 @@ public class CommandInvoker {
             throw new RuntimeException(ex);
         }
 
-        final CommandResponse resp = new CommandResponse(System.out, System.err);
+        final CommandResponse resp = new CommandResponse(
+                new PrintStream(stdout), new PrintStream(stderr)
+        );
         return new Main(resp, new CLIPool(factory)).run(buildArgs(src, dst));
     }
 
