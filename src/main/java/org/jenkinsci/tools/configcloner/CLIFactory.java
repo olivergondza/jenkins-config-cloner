@@ -91,8 +91,10 @@ public class CLIFactory {
                 pairs.add(CLI.loadKey(key));
             } catch (IOException ex) { // if the PEM file is encrypted
 
-                // Not run interactively - skip
-                if (System.console() == null) continue;
+                if (System.console() == null) {
+                    System.err.println("No interactive terminal. Skipping encrypted key " + path);
+                    continue;
+                }
 
                 // Ask for password
                 pairs.add(tryEncryptedFile(key));
