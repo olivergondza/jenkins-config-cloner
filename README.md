@@ -1,5 +1,7 @@
 # Jenkins configuration cloner
 
+Command line utility to clone stored configuration between instances to facilitate migration. Config cloner invokes CLI commands remotely to get and create/update `config.xml`s. For this to work source and destination instances are expected to use compatible versions of core and plugins.
+
 ## Requirements
 
 - Bash and Java to run. GIT and Maven to build.
