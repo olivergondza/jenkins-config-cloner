@@ -36,6 +36,17 @@ public class CloneJobIntegrationTest {
     }
 
     @Test
+    public void createACopyOfJobFromView() {
+
+        createFreeStyle("sourceJob", "Job Description");
+
+        assertTrue(command.invoke("view/AView/job/sourceJob/", "job/destJob2/").succeeded());
+
+        assertHasDescription("destJob1", "Job Description");
+        assertHasDescription("destJob2", "Job Description");
+    }
+
+    @Test
     public void createACopyOfJobOverwritingDestination() throws IOException {
 
         createFreeStyle("sourceJob", "Job Description");
