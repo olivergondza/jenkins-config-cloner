@@ -17,6 +17,8 @@
 
 ### Authentication
 
+The tools supports public key authentization only.
+
 Quoting [Jenkins CLI wiki page](https://wiki.jenkins-ci.org/display/JENKINS/Jenkins+CLI):
 
 > If your Jenkins requires authentication, you should set up public key authentication. Login from the web UI and go to http://yourserver.com/me/configure, then set your public keys in the designated text area. When connecting to the server, the CLI will look for `~/.ssh/identity`, `~/.ssh/id_dsa`, `~/.ssh/id_rsa` and use those to authenticate itself against the server.
@@ -32,13 +34,20 @@ There is a convenient wrapper called `clone.sh` to invoke `target/config-cloner-
 in a comfortable way: `./clone.sh help`.
 
 
-All the commands have the same pattern `clone.sh TYPE SRC_ITEM DST_ITEM...`. `TYPE` identifies the type of item to clone
-(`job`, `node` etc.). For the convenience items are identified with their URLs.
+All the commands have the same pattern 
 
-Clone `my-great-job` from `jenkins-old` to `jenkins-new/ci` with the same name and to`jenkins-pub` having new name `my-great-job-pub`:
+	./clone.sh TYPE SRC_ITEM DST_ITEM...
 
-	$ ./clone.sh job http://jenkins.old/job/my-great-job http://jenkins.new/ci/ http://jenkins.pub/job/my-great-job-pub
+`TYPE` identifies the type of item to clone (`job`, `node` etc.). For the convenience items are identified with their URLs.
+
+Clone `my-great-job` from `jnks.old` to `jnks.new/ci` with the same name and to`jnks.pub` having new name `my-great-job-pub`:
+
+	$ ./clone.sh job http://jnks.old/job/my-great-job http://jnks.new/ci/ http://jnks.pub/job/my-great-job-pub
 
 Likewise for nodes
 
-	$ ./clone.sh node http://jenkins.old/computer/my-slave http://jenkins.new/ci/ http://jenkins.pub/computer/cloned-slave
+	$ ./clone.sh node http://jnks.old/computer/my-slave http://jnks.new/ci/ http://jnks.pub/computer/cloned-slave
+
+### Options common to all types
+
+`-f|--force` Overwrite destination item if already exists.
