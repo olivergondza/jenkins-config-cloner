@@ -51,13 +51,9 @@ public class CommandInvoker {
         String[] mainArgs = new String[options.length + 1 + dst.length + 1];
         int i = 0;
         mainArgs[i++] = kind;
-        for(String opt: options) {
 
-            mainArgs[i++] = opt.length() == 1
-                    ? "-" + opt
-                    : "--" + opt
-            ;
-        }
+        System.arraycopy(options, 0, mainArgs, i, options.length);
+        i += options.length;
 
         mainArgs[i++] = url + src;
 

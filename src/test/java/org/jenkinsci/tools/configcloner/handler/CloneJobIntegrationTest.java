@@ -40,10 +40,9 @@ public class CloneJobIntegrationTest {
 
         createFreeStyle("sourceJob", "Job Description");
 
-        assertTrue(command.invoke("view/AView/job/sourceJob/", "job/destJob2/").succeeded());
+        assertTrue(command.invoke("view/AView/job/sourceJob/", "job/destJob/").succeeded());
 
-        assertHasDescription("destJob1", "Job Description");
-        assertHasDescription("destJob2", "Job Description");
+        assertHasDescription("destJob", "Job Description");
     }
 
     @Test
@@ -52,7 +51,7 @@ public class CloneJobIntegrationTest {
         createFreeStyle("sourceJob", "Job Description");
         j.createFreeStyleProject("destJob").setDescription("Description to be overwriten");
 
-        assertTrue(command.opts("force").invoke("job/sourceJob/", "job/destJob/").succeeded());
+        assertTrue(command.opts("--force").invoke("job/sourceJob/", "job/destJob/").succeeded());
 
         assertHasDescription("destJob", "Job Description");
     }

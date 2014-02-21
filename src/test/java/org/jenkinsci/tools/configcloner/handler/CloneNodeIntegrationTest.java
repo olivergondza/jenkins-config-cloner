@@ -43,7 +43,7 @@ public class CloneNodeIntegrationTest {
         j.createSlave("DstSlave1", "dst_label", null);
         j.createSlave("DstSlave2", "dst_label", null);
 
-        assertTrue(command.opts("force").invoke("computer/SrcSlave", "computer/DstSlave1", "computer/DstSlave2").succeeded());
+        assertTrue(command.opts("--force").invoke("computer/SrcSlave", "computer/DstSlave1", "computer/DstSlave2").succeeded());
 
         Node dstSlave1 = j.jenkins.getNode("DstSlave1");
         assertEquals("src_label", dstSlave1.getLabelString());

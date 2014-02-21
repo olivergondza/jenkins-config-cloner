@@ -49,7 +49,7 @@ public class CloneViewIntegrationTest {
         view("DstView1");
         view("DstView2");
 
-        assertTrue(command.opts("force").invoke("view/SrcView", "view/DstView1", "view/DstView2").succeeded());
+        assertTrue(command.opts("-f").invoke("view/SrcView", "view/DstView1", "view/DstView2").succeeded());
 
         View dstView1 = j.jenkins.getView("DstView1");
         assertTrue(dstView1.contains(project));
