@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
 import org.jenkinsci.tools.configcloner.UrlParser;
@@ -38,13 +37,10 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "Clone configuration of views in view from <SRC> to <DST>")
-public class CloneView extends Handler {
+public class CloneView extends TransferHandler {
 
     @Parameter(description = "[<SRC>] [<DST>...]")
     private List<String> views;
-
-    @Parameter(names = {"--force", "-f"}, description = "Overwrite target view if already exists.")
-    private boolean force = false;
 
     @Parameter(names = {"--recursive", "-r"}, description = "Transfer contained job and views.")
     private boolean recursive = false;
@@ -65,55 +61,36 @@ public class CloneView extends Handler {
         destinations();
     }
 
-    /*package*/ ConfigDestination source() {
+    @Override
+    protected ConfigDestination source() {
 
         return PARSER.destination(views.get(0));
     }
 
-    /*package*/ List<ConfigDestination> destinations() {
+    @Override
+    protected List<ConfigDestination> destinations() {
 
         return PARSER.pair(source(), views.subList(1, views.size()));
     }
 
     @Override
-    public CommandResponse run(final CommandResponse response) {
-
-        response.out().println("Fetching " + source());
-        final CommandResponse.Accumulator xml = config.execute(
-                source(), "", "get-view", source().entity()
-        );
-
-        if (!xml.succeeded()) return response.merge(xml);
-
-        for (final ConfigDestination dest: destinations()) {
-
-            response.out().println("Sending " + dest);
-            send(dest, response, xml);
-        }
-
-        return response;
+    protected String getCommandName() {
+        return "get-view";
     }
 
-    private CommandResponse send(
-            final ConfigDestination destination,
-            final CommandResponse response,
-            final CommandResponse.Accumulator xml
-    ) {
+    @Override
+    protected String updateCommandName() {
+        return "update-view";
+    }
 
-        final String destJob = destination.entity();
+    @Override
+    protected String createCommandName() {
+        return "create-view";
+    }
 
-        if (force) {
-
-            final CommandResponse.Accumulator rsp = config.execute(
-                    destination, xml.stdout(), "update-view", destJob
-            );
-
-            if (rsp.succeeded()) return response.returnCode(0);
-        }
-
-        return response.merge(
-                config.execute(destination, xml.stdout(), "create-view", destJob)
-        );
+    @Override
+    protected String deleteCommandName() {
+        return "delete-view";
     }
 
     private static final UrlParser PARSER = new UrlParser() {

@@ -88,7 +88,7 @@ public class CommandResponse {
         final ByteArrayOutputStream out;
         final ByteArrayOutputStream err;
 
-        public Accumulator(final ByteArrayOutputStream out, final ByteArrayOutputStream err) {
+        private Accumulator(final ByteArrayOutputStream out, final ByteArrayOutputStream err) {
 
             super(new PrintStream(out), new PrintStream(err));
 

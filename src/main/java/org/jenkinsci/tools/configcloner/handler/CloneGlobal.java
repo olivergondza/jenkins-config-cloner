@@ -33,7 +33,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "Clone global configuration. NOT IMPLEMENTED.")
-public class CloneGlobal extends Handler {
+public class CloneGlobal extends TransferHandler {
 
     @Parameter(description = "[<SRC>] [<DST>...]")
     private List<String> jobs;
@@ -48,6 +48,36 @@ public class CloneGlobal extends Handler {
     @Override
     public CommandResponse run(final CommandResponse response) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected ConfigDestination source() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected List<ConfigDestination> destinations() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected String getCommandName() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected String updateCommandName() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected String createCommandName() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected String deleteCommandName() {
         throw new UnsupportedOperationException();
     }
 }

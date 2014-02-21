@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
 import org.jenkinsci.tools.configcloner.UrlParser;
@@ -38,13 +37,10 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "Clone node configuration from <SRC> to <DST>")
-public class CloneNode extends Handler {
+public class CloneNode extends TransferHandler {
 
     @Parameter(description = "[<SRC>] [<DST>...]")
     private List<String> nodes;
-
-    @Parameter(names = {"--force", "-f"}, description = "Overwrite target node if exists")
-    private boolean force = false;
 
     public CloneNode(final ConfigTransfer config) {
 
@@ -62,62 +58,46 @@ public class CloneNode extends Handler {
         destinations();
     }
 
-    /*package*/ ConfigDestination source() {
+    @Override
+    protected ConfigDestination source() {
 
         return PARSER.destination(nodes.get(0));
     }
 
-    /*package*/ List<ConfigDestination> destinations() {
+    @Override
+    protected List<ConfigDestination> destinations() {
 
         return PARSER.pair(source(), nodes.subList(1, nodes.size()));
     }
 
     @Override
-    public CommandResponse run(final CommandResponse response) {
-
-        response.out().println("Fetching " + source());
-        final CommandResponse.Accumulator xml = config.execute(
-                source(), "", "get-node", source().entity()
-        );
-
-        if (!xml.succeeded()) return response.merge(xml);
-
-        for (final ConfigDestination dest: destinations()) {
-
-            response.out().println("Sending " + dest);
-            send(dest, response, xml);
-        }
-
-        return response;
+    protected String getCommandName() {
+        return "get-node";
     }
 
-    private CommandResponse send(
-            final ConfigDestination destination,
-            final CommandResponse response,
-            final CommandResponse.Accumulator xml
-    ) {
+    @Override
+    protected String updateCommandName() {
+        return "update-node";
+    }
 
-        final String destNode = destination.entity();
+    @Override
+    protected String createCommandName() {
+        return "create-node";
+    }
 
-        if (force) {
+    @Override
+    protected String deleteCommandName() {
+        return "delete-node";
+    }
 
-            // Node XML contains a name so update performs node renaming as well.
-            // Use destination name in case it differs from source node name.
-            // TODO add an option to CloneNodeCommand to suppress that behavior.
-            String nodeXml = xml.stdout().replaceFirst(
-                    "<name>.*?</name>",
-                    "<name>" + destNode + "</name>"
-            );
-
-            final CommandResponse.Accumulator rsp = config.execute(
-                    destination, nodeXml, "update-node", destNode
-            );
-
-            if (rsp.succeeded()) return response.returnCode(0);
-        }
-
-        return response.merge(
-                config.execute(destination, xml.stdout(), "create-node", destNode)
+    @Override
+    protected String fixupConfig(String config, ConfigDestination destination) {
+        // Node XML contains a name so update performs node renaming as well.
+        // Use destination name in case it differs from source node name.
+        // TODO add an option to CloneNodeCommand to suppress that behavior.
+        return config.replaceFirst(
+            "<name>.*?</name>",
+            "<name>" + destination.entity() + "</name>"
         );
     }
 
