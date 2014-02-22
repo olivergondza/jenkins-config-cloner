@@ -1,6 +1,7 @@
 package org.jenkinsci.tools.configcloner.handler;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import hudson.model.TopLevelItem;
 import hudson.model.ListView;
@@ -107,7 +108,28 @@ public class CloneViewIntegrationTest {
 
         View dstView = j.jenkins.getView("DstView");
         assertTrue(dstView.contains(project));
+    }
 
+    @Test
+    public void cloneDryRun() throws Exception {
+
+        view("SrcView");
+
+        assertTrue(command.opts("-n").invoke("view/SrcView", "view/DstView").succeeded());
+
+        assertNull("Destination should not be created", j.jenkins.getView("DstView"));
+    }
+
+    @Test
+    public void overwriteDryRun() throws Exception {
+
+        view("SrcView").add(project);
+        view("DstView");
+
+        assertTrue(command.opts("--force", "--dry-run").invoke("view/SrcView", "view/DstView").succeeded());
+
+        View dstView = j.jenkins.getView("DstView");
+        assertFalse("Destination should not be overwritten", dstView.contains(project));
     }
 
     private ListView view(String name) throws IOException {

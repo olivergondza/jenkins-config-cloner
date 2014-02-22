@@ -2,6 +2,7 @@ package org.jenkinsci.tools.configcloner.handler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import hudson.model.TopLevelItem;
 import hudson.model.FreeStyleProject;
@@ -90,6 +91,27 @@ public class CloneJobIntegrationTest {
         assertTrue(command.opts(opts).invoke("job/sourceJob/", "job/destJob/").succeeded());
 
         assertHasDescription("destJob", "Project Description");
+    }
+
+    @Test
+    public void cloneDryRun() {
+
+        createFreeStyle("sourceJob", "Job Description");
+
+        assertTrue(command.opts("--dry-run").invoke("job/sourceJob", "job/destJob").succeeded());
+
+        assertNull("Destination should not be created", j.jenkins.getNode("DstSlave"));
+    }
+
+    @Test
+    public void overwriteDryRun() {
+
+        createFreeStyle("sourceJob", "Job Description");
+        createFreeStyle("destJob", "Dest Job Description");
+
+        assertTrue(command.opts("-n").invoke("job/sourceJob", "job/destJob").succeeded());
+
+        assertHasDescription("destJob", "Dest Job Description");
     }
 
     private FreeStyleProject createFreeStyle(String name, String description) {

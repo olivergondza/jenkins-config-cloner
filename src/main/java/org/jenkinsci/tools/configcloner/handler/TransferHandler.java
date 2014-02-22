@@ -42,6 +42,9 @@ public abstract class TransferHandler extends Handler {
     @Parameter(names = {"--expression", "-e"}, description = "Transform configuration")
     protected List<String> expressions = Collections.emptyList();
 
+    @Parameter(names = {"--dry-run", "-n"}, description = "Do not perform any modifications to any instance")
+    protected boolean dryRun = false;
+
     protected TransferHandler(ConfigTransfer config) {
         super(config);
     }
@@ -87,6 +90,8 @@ public abstract class TransferHandler extends Handler {
             }
             nodeXml = builder.toStringResult();
         }
+
+        if (dryRun) return response.returnCode(0);
 
         if (force) {
 

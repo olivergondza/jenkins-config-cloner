@@ -2,6 +2,7 @@ package org.jenkinsci.tools.configcloner.handler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import hudson.model.Node;
 
@@ -83,5 +84,26 @@ public class CloneNodeIntegrationTest {
 
         Node dstSlave = j.jenkins.getNode("DstSlave");
         assertEquals("a b", dstSlave.getLabelString());
+    }
+
+    @Test
+    public void cloneDryRun() throws Exception {
+
+        j.createSlave("SrcSlave", "src_label", null);
+
+        assertTrue(command.opts("--dry-run").invoke("computer/SrcSlave", "computer/DstSlave").succeeded());
+
+        assertNull("Destination should not be created", j.jenkins.getNode("DstSlave"));
+    }
+
+    @Test
+    public void overwriteDryRun() throws Exception {
+
+        j.createSlave("SrcSlave", "src_label", null);
+        j.createSlave("DstSlave", "dst_label", null);
+
+        assertTrue(command.opts("-n").invoke("computer/SrcSlave", "computer/DstSlave").succeeded());
+
+        assertEquals("dst_label", j.jenkins.getNode("DstSlave").getLabelString());
     }
 }
