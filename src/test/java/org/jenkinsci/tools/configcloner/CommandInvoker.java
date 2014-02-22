@@ -31,7 +31,7 @@ public class CommandInvoker {
         return this;
     }
 
-    public CommandResponse invoke(String src, String... dst) {
+    public CommandResponse.Accumulator invoke(String src, String... dst) {
         RandKeyCLIFactory factory = new RandKeyCLIFactory();
 
         try {
@@ -43,8 +43,10 @@ public class CommandInvoker {
             throw new RuntimeException(ex);
         }
 
-        final CommandResponse resp = new CommandResponse(System.out, System.err);
-        return new Main(resp, new CLIPool(factory)).run(buildArgs(src, dst));
+        return (CommandResponse.Accumulator) new Main(
+                CommandResponse.accumulate(),
+                new CLIPool(factory)).run(buildArgs(src, dst)
+        );
     }
 
     private String[] buildArgs(String src, String... dst) {

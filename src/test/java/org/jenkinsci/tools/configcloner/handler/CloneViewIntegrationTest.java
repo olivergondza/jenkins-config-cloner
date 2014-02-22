@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.jenkinsci.tools.configcloner.CommandInvoker;
+import org.jenkinsci.tools.configcloner.CommandResponse.Accumulator;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -113,10 +114,15 @@ public class CloneViewIntegrationTest {
     @Test
     public void cloneDryRun() throws Exception {
 
-        view("SrcView");
+        view("SrcView").setIncludeRegex("^src-");
 
-        assertTrue(command.opts("-n").invoke("view/SrcView", "view/DstView").succeeded());
+        Accumulator result = command.opts("-n", "-e", "s/src-/dst-/")
+                .invoke("view/SrcView", "view/DstView")
+        ;
 
+        assertTrue(result.succeeded());
+        assertTrue(result.stdout().contains("-  <includeRegex>^src-</includeRegex>"));
+        assertTrue(result.stdout().contains("+  <includeRegex>^dst-</includeRegex>"));
         assertNull("Destination should not be created", j.jenkins.getView("DstView"));
     }
 

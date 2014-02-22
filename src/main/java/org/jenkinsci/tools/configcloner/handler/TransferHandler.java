@@ -23,6 +23,9 @@
  */
 package org.jenkinsci.tools.configcloner.handler;
 
+import hudson.Util;
+
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,6 +36,9 @@ import org.unix4j.Unix4j;
 import org.unix4j.builder.Unix4jCommandBuilder;
 
 import com.beust.jcommander.Parameter;
+
+import difflib.DiffUtils;
+import difflib.Patch;
 
 public abstract class TransferHandler extends Handler {
 
@@ -81,30 +87,47 @@ public abstract class TransferHandler extends Handler {
 
         final String destJob = destination.entity();
 
-        String nodeXml = fixupConfig(xml.stdout(), destination);
-
-        if (!expressions.isEmpty()) {
-            Unix4jCommandBuilder builder = Unix4j.fromString(nodeXml);
-            for (String expr: expressions) {
-                builder = builder.sed(expr);
-            }
-            nodeXml = builder.toStringResult();
-        }
+        final String xmlString = getXml(fixupConfig(xml.stdout(), destination), response);
 
         if (dryRun) return response.returnCode(0);
 
         if (force) {
 
             final CommandResponse.Accumulator rsp = config.execute(
-                    destination, nodeXml, this.updateCommandName(), destJob
+                    destination, xmlString, this.updateCommandName(), destJob
             );
 
             if (rsp.succeeded()) return response.returnCode(0);
         }
 
         return response.merge(
-                config.execute(destination, nodeXml, this.createCommandName(), destJob)
+                config.execute(destination, xmlString, this.createCommandName(), destJob)
         );
+    }
+
+    private String getXml(String rawXml, CommandResponse response) {
+
+        if (expressions.isEmpty()) return rawXml;
+
+        Unix4jCommandBuilder builder = Unix4j.fromString(rawXml);
+        for (String expr: expressions) {
+            builder = builder.sed(expr);
+        }
+
+        final String newXml = builder.toStringResult();
+
+        if (dryRun) response.out().print(describeTransformation(rawXml, newXml));
+
+        return newXml;
+    }
+
+    private String describeTransformation(String rawXml, String newXml) {
+
+        final List<String> rawLines = Arrays.asList(rawXml.split("\\r?\\n|\\r"));
+        Patch patch = DiffUtils.diff(rawLines, Arrays.asList(newXml.split("\\r?\\n|\\r")));
+
+        List<String> diff = DiffUtils.generateUnifiedDiff("Original", "Transformed", rawLines, patch, 3);
+        return Util.join(diff, System.lineSeparator());
     }
 
     /**

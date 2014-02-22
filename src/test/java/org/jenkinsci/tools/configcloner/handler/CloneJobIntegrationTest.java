@@ -10,6 +10,7 @@ import hudson.model.FreeStyleProject;
 import java.io.IOException;
 
 import org.jenkinsci.tools.configcloner.CommandInvoker;
+import org.jenkinsci.tools.configcloner.CommandResponse.Accumulator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -98,8 +99,14 @@ public class CloneJobIntegrationTest {
 
         createFreeStyle("sourceJob", "Job Description");
 
-        assertTrue(command.opts("--dry-run").invoke("job/sourceJob", "job/destJob").succeeded());
+        Accumulator result = command
+                .opts("--dry-run", "-e", "s/Description/DSCR/")
+                .invoke("job/sourceJob", "job/destJob")
+        ;
 
+        assertTrue(result.succeeded());
+        assertTrue(result.stdout().contains("-  <description>Job Description</description>"));
+        assertTrue(result.stdout().contains("+  <description>Job DSCR</description>"));
         assertNull("Destination should not be created", j.jenkins.getNode("DstSlave"));
     }
 

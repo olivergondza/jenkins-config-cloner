@@ -9,6 +9,7 @@ import hudson.model.Node;
 import java.io.IOException;
 
 import org.jenkinsci.tools.configcloner.CommandInvoker;
+import org.jenkinsci.tools.configcloner.CommandResponse.Accumulator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,8 +92,13 @@ public class CloneNodeIntegrationTest {
 
         j.createSlave("SrcSlave", "src_label", null);
 
-        assertTrue(command.opts("--dry-run").invoke("computer/SrcSlave", "computer/DstSlave").succeeded());
+        Accumulator result = command.opts("--dry-run", "-e", "s/_label//")
+                .invoke("computer/SrcSlave", "computer/DstSlave")
+        ;
 
+        assertTrue(result.succeeded());
+        assertTrue(result.stdout().contains("-  <label>src_label</label>"));
+        assertTrue(result.stdout().contains("+  <label>src</label>"));
         assertNull("Destination should not be created", j.jenkins.getNode("DstSlave"));
     }
 
