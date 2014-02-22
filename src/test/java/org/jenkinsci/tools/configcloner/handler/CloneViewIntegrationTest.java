@@ -96,6 +96,20 @@ public class CloneViewIntegrationTest {
         assertTrue(nestedView.contains(project));
     }
 
+    @Test
+    public void performTransformation() throws Exception {
+
+        ListView view = view("SrcView");
+        view.setIncludeRegex("originalRegex");
+        view.add(project);
+
+        assertTrue(command.opts("-e", "s/original/replaced/").invoke("view/SrcView", "view/DstView").succeeded());
+
+        View dstView = j.jenkins.getView("DstView");
+        assertTrue(dstView.contains(project));
+
+    }
+
     private ListView view(String name) throws IOException {
         final ListView view = new ListView(name, j.jenkins);
         j.jenkins.addView(view);

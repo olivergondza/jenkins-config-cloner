@@ -77,6 +77,21 @@ public class CloneJobIntegrationTest {
         assertHasDescription("destJob", "Description not to be overwriten");
     }
 
+    @Test
+    public void performTransformation() {
+
+        createFreeStyle("sourceJob", "Job Description");
+
+        String[] opts = new String[] {
+                "-e", "s/Job\\sDescription/asdfghjkl/",
+                "-e", "s/asdf.hjkl/Project Description/"
+        };
+
+        assertTrue(command.opts(opts).invoke("job/sourceJob/", "job/destJob/").succeeded());
+
+        assertHasDescription("destJob", "Project Description");
+    }
+
     private FreeStyleProject createFreeStyle(String name, String description) {
 
         try {

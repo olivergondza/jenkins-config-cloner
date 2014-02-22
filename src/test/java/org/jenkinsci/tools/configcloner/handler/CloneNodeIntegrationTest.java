@@ -73,4 +73,15 @@ public class CloneNodeIntegrationTest {
         Node dstSlave = j.jenkins.getNode("DstSlave");
         assertEquals("dst_label", dstSlave.getLabelString());
     }
+
+    @Test
+    public void performTransformation() throws Exception {
+
+        j.createSlave("SrcSlave", "a_label b_label", null);
+
+        assertTrue(command.opts("--expression", "s/_label//g").invoke("computer/SrcSlave", "computer/DstSlave").succeeded());
+
+        Node dstSlave = j.jenkins.getNode("DstSlave");
+        assertEquals("a b", dstSlave.getLabelString());
+    }
 }
