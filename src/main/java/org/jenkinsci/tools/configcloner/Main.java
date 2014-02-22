@@ -68,9 +68,7 @@ public class Main {
 
     private void setupMapping(CLIPool cliPool) {
 
-        final ConfigTransfer config = new ConfigTransfer(
-                new CommandResponse(System.out, System.err), cliPool
-        );
+        final ConfigTransfer config = new ConfigTransfer(cliPool);
 
         addCommand(  "help", usage);
         addCommand(   "job", new CloneJob(config));

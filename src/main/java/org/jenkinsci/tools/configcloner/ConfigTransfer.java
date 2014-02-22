@@ -26,17 +26,15 @@ package org.jenkinsci.tools.configcloner;
 import hudson.cli.CLI;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class ConfigTransfer {
 
-    private final CommandResponse response;
     private final CLIPool cliPool;
 
-    public ConfigTransfer(final CommandResponse response, final CLIPool cliPool) {
-
-        this.response = response;
+    public ConfigTransfer(final CLIPool cliPool) {
         this.cliPool = cliPool;
     }
 
@@ -46,17 +44,18 @@ public class ConfigTransfer {
             final String... command
     ) {
 
+        final CLI service = cliPool.connection(destination.jenkins());
+
+        final CommandResponse.Accumulator response = CommandResponse.accumulate();
+        final int ret = service.execute(Arrays.asList(command), inputStream(stdin), response.out(), response.err());
+        return response.returnCode(ret);
+    }
+
+    private InputStream inputStream(String in) {
+
         try {
 
-            final CLI service = cliPool.connection(destination.jenkins());
-            final CommandResponse.Accumulator response = this.response.accumulate();
-            final ByteArrayInputStream in = new ByteArrayInputStream(
-                    stdin.getBytes("UTF-8")
-            );
-
-            final int ret = service.execute(Arrays.asList(command), in, response.out(), response.err());
-            return response.returnCode(ret);
-
+            return new ByteArrayInputStream(in.getBytes("UTF-8"));
         } catch (final UnsupportedEncodingException ex) {
 
             throw new AssertionError(ex);
