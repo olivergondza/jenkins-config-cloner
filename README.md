@@ -52,4 +52,7 @@ Likewise for nodes
 
 ### Options common to all types
 
-`-f|--force` Overwrite destination item if already exists.
+- `-f`|`--force` Overwrite destination item if already exists.
+- `-e`|`--expression` Transform XML using sed-like expression.
+- `-n`|`--dry-run` Simulate actual coloning but avoid any modifications to any instance.
+
