@@ -49,4 +49,9 @@ public class Usage extends Handler {
 
         return response;
     }
+
+    @Override
+    public String name() {
+        return "help";
+    }
 }

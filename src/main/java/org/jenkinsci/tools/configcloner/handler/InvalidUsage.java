@@ -47,4 +47,9 @@ public class InvalidUsage extends Handler {
         response.returnCode(-1);
         return this.usage.run(response);
     }
+
+    @Override
+    public String name() {
+        throw new UnsupportedOperationException();
+    }
 }

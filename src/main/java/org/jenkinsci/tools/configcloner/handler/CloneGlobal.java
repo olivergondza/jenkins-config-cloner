@@ -80,4 +80,9 @@ public class CloneGlobal extends TransferHandler {
     protected String deleteCommandName() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String name() {
+        return "global";
+    }
 }

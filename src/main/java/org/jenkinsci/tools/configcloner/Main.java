@@ -70,17 +70,17 @@ public class Main {
 
         final ConfigTransfer config = new ConfigTransfer(cliPool);
 
-        addCommand(  "help", usage);
-        addCommand(   "job", new CloneJob(config));
-        addCommand(  "view", new CloneView(config));
-        addCommand(  "node", new CloneNode(config));
-        addCommand("global", new CloneGlobal(config));
+        addCommand(usage);
+        addCommand(new CloneJob(config));
+        addCommand(new CloneView(config));
+        addCommand(new CloneNode(config));
+        addCommand(new CloneGlobal(config));
     }
 
-    private void addCommand(final String name, final Handler handler) {
+    private void addCommand(final Handler handler) {
 
-        commandMapping.put(name, handler);
-        commander.addCommand(name, handler);
+        commandMapping.put(handler.name(), handler);
+        commander.addCommand(handler.name(), handler);
     }
 
     public CommandResponse run(final String... args) {

@@ -38,4 +38,6 @@ public abstract class Handler {
     public void validate() {}
 
     public abstract CommandResponse run(final CommandResponse response);
+
+    public abstract String name();
 }

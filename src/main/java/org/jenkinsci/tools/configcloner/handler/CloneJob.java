@@ -108,4 +108,9 @@ public class CloneJob extends TransferHandler {
             return new ConfigDestination(jenkins, entity);
         }
     };
+
+    @Override
+    public String name() {
+        return "job";
+    }
 }
