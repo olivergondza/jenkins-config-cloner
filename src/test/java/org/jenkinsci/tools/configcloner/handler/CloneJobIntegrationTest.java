@@ -107,7 +107,7 @@ public class CloneJobIntegrationTest {
         assertTrue(result.succeeded());
         assertTrue(result.stdout().contains("-  <description>Job Description</description>"));
         assertTrue(result.stdout().contains("+  <description>Job DSCR</description>"));
-        assertNull("Destination should not be created", j.jenkins.getNode("DstSlave"));
+        assertNull("Destination should not be created", j.jenkins.getItem("DstJob"));
     }
 
     @Test
@@ -119,6 +119,17 @@ public class CloneJobIntegrationTest {
         assertTrue(command.opts("-n").invoke("job/sourceJob", "job/destJob").succeeded());
 
         assertHasDescription("destJob", "Dest Job Description");
+    }
+
+    @Test
+    public void failEvenIfLastTrasferSucceeds() {
+
+        createFreeStyle("sourceJob", "Job Description");
+        createFreeStyle("existingJob", "");
+
+        assertFalse(command.invoke("job/sourceJob", "job/existingJob", "job/destJob").succeeded());
+
+        assertHasDescription("destJob", "Job Description");
     }
 
     private FreeStyleProject createFreeStyle(String name, String description) {

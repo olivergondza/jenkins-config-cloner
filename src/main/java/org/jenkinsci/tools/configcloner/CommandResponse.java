@@ -76,7 +76,9 @@ public class CommandResponse {
 
     public CommandResponse merge(final Accumulator response) {
 
-        returnCode = response.returnCode();
+        if (returnCode == 0) {
+            returnCode = response.returnCode();
+        }
         outputStream.append(response.stdout());
         errorStream.append(response.stderr());
 
