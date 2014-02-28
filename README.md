@@ -35,6 +35,7 @@ Get and build:
 There is a convenient wrapper called `clone.sh` to invoke `target/config-cloner-${VERSION}-jar-with-dependencies.jar`
 in a comfortable way: `./clone.sh help`.
 
+## Cloning
 
 General commands have the same pattern 
 
@@ -62,3 +63,30 @@ Clone `my-great-job` from `jnks.old` to `jnks.new/ci` with the same name and to`
 - `-e`|`--expression` Transform XML using sed-like expression.
 - `-n`|`--dry-run` Simulate actual coloning but avoid any modifications to any instance.
 
+## Recipes
+
+Recipes are groovy files describing more complex migration using other clone commands. Recipes are run using:
+
+	$ ./clone.sh recipe my-migration.groovy
+
+where `my-migration.groovy` may look like:
+
+	def src = "http://localhost:8080"
+	def dst = "http://localhost:8081"
+	def pub = "http://localhost:8082"
+	
+	clone.job  "$src/job/my-job", "$dst/job/cloned-job/"
+	clone.node "$src/computer/my-slave/", "$dst/computer/cloned-slave/"
+	clone.view "$src/view/my-view/", "$dst/view/cloned-view/"
+	
+	clone.job  "$dst/job/cloned-job", "$pub/job/cloned-cloned-job/"
+	clone.node "$dst/computer/cloned-slave/", "$pub/computer/cloned-cloned-slave/"
+	clone.view "$dst/view/cloned-view/", "$pub/view/cloned-cloned-view/"
+	
+	println "We're done"
+
+### Available options (for recipe command)
+
+Clone commands run from recipe can use all available options for given command.
+
+- `-n`|`--dry-run` Simulate actual coloning but avoid any modifications to any instance.
