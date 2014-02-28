@@ -23,6 +23,7 @@
  */
 package org.jenkinsci.tools.configcloner;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import org.jenkinsci.tools.configcloner.handler.CloneNode;
 import org.jenkinsci.tools.configcloner.handler.CloneView;
 import org.jenkinsci.tools.configcloner.handler.Handler;
 import org.jenkinsci.tools.configcloner.handler.InvalidUsage;
+import org.jenkinsci.tools.configcloner.handler.Recipe;
 import org.jenkinsci.tools.configcloner.handler.Usage;
 
 import com.beust.jcommander.JCommander;
@@ -42,27 +44,22 @@ public class Main {
     private final CommandResponse response;
     private final JCommander commander = new JCommander();
     private final Handler usage = new Usage(commander);
-    private final CLIPool cliPool;
     private final Map<String, Handler> commandMapping = new HashMap<String, Handler>();
 
     public static void main(final String[] args) {
 
         final CommandResponse resp = new CommandResponse(System.out, System.err);
-        final CommandResponse response = new Main(resp).run(args);
+        final CLIPool cliPool = new CLIPool();
+        final CommandResponse response = new Main(resp, cliPool).run(args);
 
+        cliPool.close();
         System.exit(response.returnCode());
-    }
-
-    public Main(final CommandResponse response) {
-
-        this(response, new CLIPool());
     }
 
     public Main(CommandResponse response, CLIPool cliPool) {
         commander.setProgramName("remote-cloner");
 
         this.response = response;
-        this.cliPool = cliPool;
         setupMapping(cliPool);
     }
 
@@ -75,6 +72,7 @@ public class Main {
         addCommand(new CloneView(config));
         addCommand(new CloneNode(config));
         addCommand(new CloneGlobal(config));
+        addCommand(new Recipe(config, cliPool));
     }
 
     private void addCommand(final Handler handler) {
@@ -112,8 +110,12 @@ public class Main {
                 "null response from " + handler.toString()
         );
 
-        cliPool.close();
         return response;
+    }
+
+    public Map<String, Handler> commandMapping() {
+
+        return Collections.unmodifiableMap(commandMapping);
     }
 
     public Handler getHandler(final String... args) {

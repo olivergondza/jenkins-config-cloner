@@ -6,10 +6,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
-import org.jenkinsci.tools.configcloner.CommandResponse;
-import org.jenkinsci.tools.configcloner.Main;
 import org.jenkinsci.tools.configcloner.handler.Handler;
 import org.powermock.modules.testng.PowerMockTestCase;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 public class Abstract extends PowerMockTestCase {
@@ -20,6 +19,7 @@ public class Abstract extends PowerMockTestCase {
     private PrintStream err = new PrintStream(berr);
     protected Main main;
     protected CommandResponse inResponse;
+    private CLIPool cliPool;
 
     @BeforeMethod
     public void setUp() {
@@ -30,7 +30,13 @@ public class Abstract extends PowerMockTestCase {
         err = new PrintStream(berr);
 
         inResponse = new CommandResponse(out, err);
-        main = new Main(inResponse);
+        cliPool = new CLIPool();
+        main = new Main(inResponse, cliPool);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        cliPool.close();
     }
 
     protected Handler dispatch(final String... args) {

@@ -10,6 +10,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,21 +33,27 @@ public class CommandInvoker {
     }
 
     public CommandResponse.Accumulator invoke(String src, String... dst) {
-        RandKeyCLIFactory factory = new RandKeyCLIFactory();
 
-        try {
-
-            User.current().addProperty(new UserPropertyImpl(
-                   factory.publicKeyString()
-            ));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-
-        return (CommandResponse.Accumulator) new Main(
+        final Main main = new Main(
                 CommandResponse.accumulate(),
-                new CLIPool(factory)).run(buildArgs(src, dst)
+                getCLIPoolForTest()
         );
+
+        return (CommandResponse.Accumulator) main.run(buildArgs(src, dst));
+    }
+
+    public CommandResponse.Accumulator run(String... args) {
+
+        final Main main = new Main(
+                CommandResponse.accumulate(),
+                getCLIPoolForTest()
+        );
+
+        final ArrayList<String> params = new ArrayList<String>();
+        params.add(kind);
+        params.addAll(Arrays.asList(args));
+
+        return (CommandResponse.Accumulator) main.run(params.toArray(new String[params.size()]));
     }
 
     private String[] buildArgs(String src, String... dst) {
@@ -65,6 +72,24 @@ public class CommandInvoker {
         }
 
         return mainArgs;
+    }
+
+    public static CLIPool getCLIPoolForTest() {
+
+        RandKeyCLIFactory factory = new RandKeyCLIFactory();
+
+        try {
+
+            User.current().addProperty(new UserPropertyImpl(
+                   factory.publicKeyString()
+            ));
+        } catch (NullPointerException ex) {
+            return new CLIPool(); // Not running Jenkins
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        return new CLIPool(factory);
     }
 
     private static class RandKeyCLIFactory extends org.jenkinsci.tools.configcloner.CLIFactory {
