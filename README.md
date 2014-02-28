@@ -36,19 +36,25 @@ There is a convenient wrapper called `clone.sh` to invoke `target/config-cloner-
 in a comfortable way: `./clone.sh help`.
 
 
-All the commands have the same pattern 
+General commands have the same pattern 
 
 	./clone.sh TYPE SRC_ITEM DST_ITEM...
 
-`TYPE` identifies the type of item to clone (`job`, `node` etc.). For the convenience items are identified with their URLs.
+`TYPE` identifies the type of item to clone (`job`, `node` etc.). For the convenience items can be identified with their URLs.
+
+### Clone jobs
 
 Clone `my-great-job` from `jnks.old` to `jnks.new/ci` with the same name and to`jnks.pub` having new name `my-great-job-pub`:
 
 	$ ./clone.sh job http://jnks.old/job/my-great-job http://jnks.new/ci/ http://jnks.pub/job/my-great-job-pub
 
-Likewise for nodes
+### Clone nodes
 
 	$ ./clone.sh node http://jnks.old/computer/my-slave http://jnks.new/ci/ http://jnks.pub/computer/cloned-slave
+
+### Clone view
+
+	$ ./clone.sh view http://jnks.old/view/my-view http://jnks.new/ci/ http://jnks.pub/view/cloned-view
 
 ### Options common to all types
 
