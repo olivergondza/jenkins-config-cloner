@@ -140,7 +140,7 @@ public class Recipe extends Handler {
             CommandResponse result = new Main(response, cliPool).run(arrayArgs);
 
             if (recipeResult == 0 && result.returnCode() != 0) {
-System.out.println("Setting return code: " + result.returnCode());
+
                 recipeResult = result.returnCode();
             }
         }
