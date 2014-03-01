@@ -80,7 +80,7 @@ public class CloneNodeTest extends Abstract {
 
     private void initialize(final String[] args) {
 
-        Whitebox.setInternalState(handler, "nodes", args == null ? null : Arrays.asList(args));
+        Whitebox.setInternalState(handler, "entities", args == null ? null : Arrays.asList(args));
         handler.validate();
     }
 }

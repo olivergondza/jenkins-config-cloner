@@ -24,7 +24,6 @@
 package org.jenkinsci.tools.configcloner.handler;
 
 import java.net.URL;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,14 +32,10 @@ import org.jenkinsci.tools.configcloner.ConfigTransfer;
 import org.jenkinsci.tools.configcloner.UrlParser;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "Clone configuration of views in view from <SRC> to <DST>")
 public class CloneView extends TransferHandler {
-
-    @Parameter(description = "[<SRC>] [<DST>...]")
-    private List<String> views;
 
     @Parameter(names = {"--recursive", "-r"}, description = "Transfer contained job and views.")
     private boolean recursive = false;
@@ -48,29 +43,6 @@ public class CloneView extends TransferHandler {
     public CloneView(final ConfigTransfer config) {
 
         super(config);
-    }
-
-    @Override
-    public void validate() {
-
-        if (views == null || views.size() < 2) throw new ParameterException(
-                "Expecting 2 or more positional arguments"
-        );
-
-        // Instantiates all destinations
-        destinations();
-    }
-
-    @Override
-    protected ConfigDestination source() {
-
-        return PARSER.destination(views.get(0));
-    }
-
-    @Override
-    protected List<ConfigDestination> destinations() {
-
-        return PARSER.pair(source(), views.subList(1, views.size()));
     }
 
     @Override
@@ -93,24 +65,26 @@ public class CloneView extends TransferHandler {
         return "delete-view";
     }
 
-    private static final UrlParser PARSER = new UrlParser() {
+    @Override
+    protected UrlParser urlParser() {
+        return new UrlParser() {
+            @Override
+            protected ConfigDestination parseDestination(final URL url) {
 
-        @Override
-        protected ConfigDestination parseDestination(final URL url) {
+                final Matcher urlMatcher = Pattern
+                        .compile("^(.*?/)view/([^/]+(?:/view/[^/]+)*).*")
+                        .matcher(url.toString())
+                ;
 
-            final Matcher urlMatcher = Pattern
-                    .compile("^(.*?/)view/([^/]+(?:/view/[^/]+)*).*")
-                    .matcher(url.toString())
-            ;
+                if (!urlMatcher.matches()) return new ConfigDestination(url, "");
 
-            if (!urlMatcher.matches()) return new ConfigDestination(url, "");
+                final String jenkins = urlMatcher.group(1);
+                String entity = urlMatcher.group(2).replaceAll("/view/", "/");
 
-            final String jenkins = urlMatcher.group(1);
-            String entity = urlMatcher.group(2).replaceAll("/view/", "/");
-
-            return new ConfigDestination(jenkins, entity);
-        }
-    };
+                return new ConfigDestination(jenkins, entity);
+            }
+        };
+    }
 
     @Override
     public String name() {

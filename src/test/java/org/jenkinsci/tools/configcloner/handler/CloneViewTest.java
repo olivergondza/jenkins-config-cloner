@@ -91,7 +91,7 @@ public class CloneViewTest extends Abstract {
 
     private void initialize(final String[] args) {
 
-        Whitebox.setInternalState(handler, "views", args == null ? null : Arrays.asList(args));
+        Whitebox.setInternalState(handler, "entities", args == null ? null : Arrays.asList(args));
         handler.validate();
     }
 }

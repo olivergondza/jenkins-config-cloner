@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jenkinsci.tools.configcloner.handler.CloneGlobal;
 import org.jenkinsci.tools.configcloner.handler.CloneJob;
 import org.jenkinsci.tools.configcloner.handler.CloneNode;
 import org.jenkinsci.tools.configcloner.handler.CloneView;
@@ -71,7 +70,6 @@ public class Main {
         addCommand(new CloneJob(config));
         addCommand(new CloneView(config));
         addCommand(new CloneNode(config));
-        addCommand(new CloneGlobal(config));
         addCommand(new Recipe(config, cliPool));
     }
 

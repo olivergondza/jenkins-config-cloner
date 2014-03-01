@@ -65,5 +65,4 @@ public class Abstract extends PowerMockTestCase {
 
         return null;
     }
-
 }

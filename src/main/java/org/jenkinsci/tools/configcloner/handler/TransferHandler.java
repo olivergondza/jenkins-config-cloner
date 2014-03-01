@@ -32,15 +32,20 @@ import java.util.List;
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
+import org.jenkinsci.tools.configcloner.UrlParser;
 import org.unix4j.Unix4j;
 import org.unix4j.builder.Unix4jCommandBuilder;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 
 import difflib.DiffUtils;
 import difflib.Patch;
 
 public abstract class TransferHandler extends Handler {
+
+    @Parameter(description = "[<SRC>] [<DST>...]")
+    private List<String> entities;
 
     @Parameter(names = {"--force", "-f"}, description = "Overwrite target configuration if exists")
     protected boolean force = false;
@@ -137,8 +142,29 @@ public abstract class TransferHandler extends Handler {
         return config;
     }
 
-    protected abstract ConfigDestination source();
-    protected abstract List<ConfigDestination> destinations();
+    protected ConfigDestination source() {
+
+        return urlParser().destination(entities.get(0));
+    }
+
+    protected List<ConfigDestination> destinations() {
+
+        return urlParser().pair(source(), entities.subList(1, entities.size()));
+    }
+
+    @Override
+    public void validate() {
+
+        if (entities == null || entities.size() < 2) throw new ParameterException(
+                "Expecting 2 or more positional arguments"
+        );
+
+        // Instantiates all destinations
+        destinations();
+    }
+
+    protected abstract UrlParser urlParser();
+
     protected abstract String getCommandName();
     protected abstract String updateCommandName();
     protected abstract String createCommandName();
