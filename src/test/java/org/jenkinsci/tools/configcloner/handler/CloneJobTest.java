@@ -8,12 +8,9 @@ import java.util.Arrays;
 
 import org.jenkinsci.tools.configcloner.CommandInvoker;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
-import org.jenkinsci.tools.configcloner.Main;
-import org.powermock.reflect.Whitebox;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
 public class CloneJobTest {
@@ -98,9 +95,6 @@ public class CloneJobTest {
     private TransferHandler handler(final String[] args) {
 
         final CommandInvoker invoker = new CommandInvoker("job").args(args);
-        final Main main = invoker.main();
-        Whitebox.getInternalState(main, JCommander.class).parse(invoker.commandArgs());
-
-        return (TransferHandler) main.getHandler();
+        return (TransferHandler) invoker.main().getHandler(invoker.commandArgs());
     }
 }

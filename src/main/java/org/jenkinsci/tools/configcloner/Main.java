@@ -84,8 +84,7 @@ public class Main {
         Handler handler;
         try {
 
-            commander.parse(args);
-            handler = getHandler();
+            handler = getHandler(args);
         } catch (final ParameterException ex) {
 
             handler = new InvalidUsage(commander, ex);
@@ -118,7 +117,9 @@ public class Main {
         return Collections.unmodifiableMap(commandMapping);
     }
 
-    public Handler getHandler() {
+    public Handler getHandler(final String... args) {
+
+        commander.parse(args);
 
         final Handler handler = commandMapping.get(commander.getParsedCommand());
 
