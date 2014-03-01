@@ -35,8 +35,6 @@ public abstract class Handler {
         this.config = config;
     }
 
-    public void validate() {}
-
     public abstract CommandResponse run(final CommandResponse response);
 
     public abstract String name();

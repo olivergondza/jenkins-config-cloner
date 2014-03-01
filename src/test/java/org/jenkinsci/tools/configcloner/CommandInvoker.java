@@ -41,11 +41,15 @@ public class CommandInvoker {
             args(immediateArgs);
         }
 
+        return (CommandResponse.Accumulator) main().run(commandArgs());
+    }
+
+    public String[] commandArgs() {
         final String[] args = new String[this.options.length + this.arguments.length + 1];
         args[0] = kind;
         System.arraycopy(this.options, 0, args, 1, this.options.length);
         System.arraycopy(this.arguments, 0, args, this.options.length + 1, this.arguments.length);
-        return (CommandResponse.Accumulator) main().run(args);
+        return args;
     }
 
     public Main main() {

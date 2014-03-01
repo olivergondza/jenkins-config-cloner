@@ -63,19 +63,23 @@ public abstract class TransferHandler extends Handler {
     /**
      * Template method to fetch and sent to many.
      *
-     * Expects superclass will override *CommandName methods. This can be overriden in case the template is not suitable.
+     * Expects subclasses override *CommandName methods. This can be overriden in case the template is not suitable.
      */
     @Override
     public CommandResponse run(final CommandResponse response) {
 
-        response.out().println("Fetching " + this.source());
+        // Get both of these before doing any work to fail validation early.
+        final ConfigDestination source = this.source();
+        final List<ConfigDestination> destinations = this.destinations();
+
+        response.out().println("Fetching " + source);
         final CommandResponse.Accumulator xml = config.execute(
-                this.source(), "", this.getCommandName(), this.source().entity()
+                source, "", this.getCommandName(), source.entity()
         );
 
         if (!xml.succeeded()) return response.merge(xml);
 
-        for (final ConfigDestination dest: this.destinations()) {
+        for (final ConfigDestination dest: destinations) {
 
             response.out().println("Sending " + dest);
             send(dest, response, xml);
@@ -143,24 +147,17 @@ public abstract class TransferHandler extends Handler {
     }
 
     protected ConfigDestination source() {
-
+        if (entities == null || entities.size() < 2) throw new ParameterException(
+                "Expecting 2 or more positional arguments"
+        );
         return urlParser().destination(entities.get(0));
     }
 
     protected List<ConfigDestination> destinations() {
-
-        return urlParser().pair(source(), entities.subList(1, entities.size()));
-    }
-
-    @Override
-    public void validate() {
-
         if (entities == null || entities.size() < 2) throw new ParameterException(
                 "Expecting 2 or more positional arguments"
         );
-
-        // Instantiates all destinations
-        destinations();
+        return urlParser().pair(source(), entities.subList(1, entities.size()));
     }
 
     protected abstract UrlParser urlParser();

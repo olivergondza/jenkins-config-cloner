@@ -6,23 +6,24 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
-import org.jenkinsci.tools.configcloner.Abstract;
+import org.jenkinsci.tools.configcloner.CommandInvoker;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
-import org.mockito.Mockito;
+import org.jenkinsci.tools.configcloner.Main;
 import org.powermock.reflect.Whitebox;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
-public class CloneJobTest extends Abstract {
-
-    private final CloneJob handler = Mockito.mock(CloneJob.class, Mockito.CALLS_REAL_METHODS);
+public class CloneJobTest {
 
     @Test(dataProvider = "invalidArgs", expectedExceptions = ParameterException.class)
     public void failWithIncorectArguments(final String[] args) {
 
-        initialize(args);
+        final TransferHandler handler = handler(args);
+        handler.source();
+        handler.destinations();
     }
 
     @DataProvider
@@ -30,7 +31,6 @@ public class CloneJobTest extends Abstract {
 
         return new String[][][] {
                 // invalid count
-                {null},
                 {{}},
                 {{"http://jenki.ns"}},
                 {{"http://jenki.ns", "http://jenki.ns", "http://jenki.ns"}},
@@ -48,7 +48,7 @@ public class CloneJobTest extends Abstract {
     @Test(dataProvider = "validArgs")
     public void parseValidDestinations(final String[] args, final ConfigDestination[] dests) {
 
-        initialize(args);
+        final TransferHandler handler = handler(args);
 
         assertEquals(dests[0], handler.source());
         assertEquals(
@@ -95,9 +95,12 @@ public class CloneJobTest extends Abstract {
         };
     }
 
-    private void initialize(final String[] args) {
+    private TransferHandler handler(final String[] args) {
 
-        Whitebox.setInternalState(handler, "entities", args == null ? null : Arrays.asList(args));
-        handler.validate();
+        final CommandInvoker invoker = new CommandInvoker("job").args(args);
+        final Main main = invoker.main();
+        Whitebox.getInternalState(main, JCommander.class).parse(invoker.commandArgs());
+
+        return (TransferHandler) main.getHandler();
     }
 }

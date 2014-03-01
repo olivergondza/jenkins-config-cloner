@@ -85,30 +85,32 @@ public class Main {
         try {
 
             commander.parse(args);
-
             handler = getHandler();
-            handler.validate();
         } catch (final ParameterException ex) {
 
             handler = new InvalidUsage(usage, ex.getMessage());
         }
 
-        CommandResponse response;
+        runHandler(handler);
+
+        return response;
+    }
+
+    private void runHandler(final Handler handler) {
+
         try {
 
-            response = handler.run(this.response);
+            handler.run(response);
         } catch (final ParameterException ex) {
 
-            response = this.response;
+            assert !(handler instanceof InvalidUsage): "InvalidUsage handler broken";
+
+            runHandler(new InvalidUsage(usage, ex.getMessage()));
+        } catch (final Exception ex) {
+
             response.err().println(ex.getMessage());
             response.returnCode(-1);
         }
-
-        if (response == null) throw new AssertionError(
-                "null response from " + handler.toString()
-        );
-
-        return response;
     }
 
     public Map<String, Handler> commandMapping() {
