@@ -88,7 +88,7 @@ public class Main {
             handler = getHandler();
         } catch (final ParameterException ex) {
 
-            handler = new InvalidUsage(usage, ex.getMessage());
+            handler = new InvalidUsage(commander, ex);
         }
 
         runHandler(handler);
@@ -105,7 +105,7 @@ public class Main {
 
             assert !(handler instanceof InvalidUsage): "InvalidUsage handler broken";
 
-            runHandler(new InvalidUsage(usage, ex.getMessage()));
+            runHandler(new InvalidUsage(commander, ex));
         } catch (final Exception ex) {
 
             response.err().println(ex.getMessage());

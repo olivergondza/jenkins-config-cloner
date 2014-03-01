@@ -25,27 +25,22 @@ package org.jenkinsci.tools.configcloner.handler;
 
 import org.jenkinsci.tools.configcloner.CommandResponse;
 
-public class InvalidUsage extends Handler {
+import com.beust.jcommander.JCommander;
 
-    private final Handler usage;
-    private final String message;
+public class InvalidUsage extends Usage {
 
-    public InvalidUsage(final Handler usage, final String message) {
+    private final Exception ex;
 
-        super(null);
-
-        assert (usage instanceof Usage);
-
-        this.usage = usage;
-        this.message = message;
+    public InvalidUsage(final JCommander commander, final Exception ex) {
+        super(commander);
+        this.ex = ex;
     }
 
     @Override
     public CommandResponse run(final CommandResponse response) {
-
-        response.err().println(message);
+        response.err().println(ex.getMessage());
         response.returnCode(-1);
-        return this.usage.run(response);
+        return super.run(response);
     }
 
     @Override
