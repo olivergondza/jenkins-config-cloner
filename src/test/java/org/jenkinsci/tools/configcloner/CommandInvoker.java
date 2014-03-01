@@ -10,7 +10,6 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,12 +17,11 @@ import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 
 public class CommandInvoker {
 
-    private final URL url;
-    private final String kind;
-    private String[] options = new String[] {};
+    protected final String kind;
+    protected String[] options = new String[] {};
+    protected String[] arguments = new String[] {};
 
-    public CommandInvoker(URL url, String kind) {
-        this.url = url;
+    public CommandInvoker(String kind) {
         this.kind = kind;
     }
 
@@ -32,46 +30,26 @@ public class CommandInvoker {
         return this;
     }
 
-    public CommandResponse.Accumulator invoke(String src, String... dst) {
-
-        final Main main = new Main(
-                CommandResponse.accumulate(),
-                getCLIPoolForTest()
-        );
-
-        return (CommandResponse.Accumulator) main.run(buildArgs(src, dst));
+    public CommandInvoker args(String... args) {
+        this.arguments = args;
+        return this;
     }
 
-    public CommandResponse.Accumulator run(String... args) {
+    public CommandResponse.Accumulator invoke(String... immediateArgs) {
 
-        final Main main = new Main(
-                CommandResponse.accumulate(),
-                getCLIPoolForTest()
-        );
-
-        final ArrayList<String> params = new ArrayList<String>();
-        params.add(kind);
-        params.addAll(Arrays.asList(args));
-
-        return (CommandResponse.Accumulator) main.run(params.toArray(new String[params.size()]));
-    }
-
-    private String[] buildArgs(String src, String... dst) {
-        String[] mainArgs = new String[options.length + 1 + dst.length + 1];
-        int i = 0;
-        mainArgs[i++] = kind;
-
-        System.arraycopy(options, 0, mainArgs, i, options.length);
-        i += options.length;
-
-        mainArgs[i++] = url + src;
-
-        for(String arg: dst) {
-
-            mainArgs[i++] = url + arg;
+        if (immediateArgs.length != 0) {
+            args(immediateArgs);
         }
 
-        return mainArgs;
+        final String[] args = new String[this.options.length + this.arguments.length + 1];
+        args[0] = kind;
+        System.arraycopy(this.options, 0, args, 1, this.options.length);
+        System.arraycopy(this.arguments, 0, args, this.options.length + 1, this.arguments.length);
+        return (CommandResponse.Accumulator) main().run(args);
+    }
+
+    public Main main() {
+        return new Main(CommandResponse.accumulate(), getCLIPoolForTest());
     }
 
     public static CLIPool getCLIPoolForTest() {
@@ -140,6 +118,38 @@ public class CommandInvoker {
             } catch (InvocationTargetException ex) {
                 throw new RuntimeException(ex);
             }
+        }
+    }
+
+    public final Url url(URL url) {
+        return new Url(url, kind);
+    }
+
+    /**
+     * Invoker prepending url to args.
+     */
+    public static class Url extends CommandInvoker {
+
+        private final URL url;
+
+        public Url(URL url, String kind) {
+            super(kind);
+            this.url = url;
+        }
+
+        @Override
+        public CommandInvoker args(String... args) {
+
+            String[] mainArgs = new String[args.length];
+            int i = 0;
+
+            for(String arg: args) {
+
+                mainArgs[i++] = url + arg;
+            }
+
+            this.arguments = mainArgs;
+            return this;
         }
     }
 }

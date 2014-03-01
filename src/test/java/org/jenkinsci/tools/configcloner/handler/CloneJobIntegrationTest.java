@@ -23,7 +23,7 @@ public class CloneJobIntegrationTest {
 
     @Before
     public void setUp() throws IOException {
-        command = new CommandInvoker(j.getURL(), "job");
+        command = new CommandInvoker("job").url(j.getURL());
     }
 
     @Test

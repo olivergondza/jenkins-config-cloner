@@ -22,7 +22,7 @@ public class CloneNodeIntegrationTest {
 
     @Before
     public void setUp() throws IOException {
-        command = new CommandInvoker(j.getURL(), "node");
+        command = new CommandInvoker("node").url(j.getURL());
     }
 
     @Test

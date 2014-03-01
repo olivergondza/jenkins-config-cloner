@@ -27,7 +27,7 @@ public class CloneViewIntegrationTest {
 
     @Before
     public void setUp() throws IOException {
-        command = new CommandInvoker(j.getURL(), "view");
+        command = new CommandInvoker("view").url(j.getURL());
         project = j.createFreeStyleProject("project");
     }
 
