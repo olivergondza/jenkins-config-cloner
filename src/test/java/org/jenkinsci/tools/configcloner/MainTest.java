@@ -5,50 +5,45 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.text.IsEmptyString.isEmptyString;
 
-
-import org.jenkinsci.tools.configcloner.Main;
-import org.jenkinsci.tools.configcloner.handler.Handler;
+import org.jenkinsci.tools.configcloner.CommandResponse.Accumulator;
 import org.jenkinsci.tools.configcloner.handler.Usage;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import com.beust.jcommander.ParameterException;
+public class MainTest {
 
-@PrepareForTest(Main.class)
-public class MainTest extends Abstract {
+    final Accumulator rsp = CommandResponse.accumulate();
 
     @Test
     public void getUsageWhenNoArgsProvided() {
 
-        assertThat(dispatch(), instanceOf(Usage.class));
+        assertThat(run().getHandler(), instanceOf(Usage.class));
     }
 
     @Test
     public void getUsageWhenInvalidArgsProvided() {
 
-        assertThat(dispatch("no-such-command"), instanceOf(Usage.class));
+        assertThat(run("no-such-command").getHandler(), instanceOf(Usage.class));
     }
 
     @Test
     public void failedValidationShouldInvokeUsage() {
 
-        final Handler handler = PowerMockito.mock(Handler.class);
-        Mockito.doThrow(new ParameterException("Fake Exception")).when(handler).validate();
+        run("job", "invalid-arg");
 
-        final Main main = PowerMockito.spy(this.main);
-        PowerMockito.when(main.getHandler("global")).thenReturn(handler);
+        assertThat(rsp.returnCode(), not(equalTo(0)));
+        assertThat(rsp.stderr(), not(isEmptyString()));
+        assertThat(rsp.stdout(), containsString("Usage: "));
+    }
 
-        final int code = main.run("global").returnCode();
+    private Main run(String... args) {
 
-        assertThat(code, not(equalTo(0)));
+        final CLIPool cliPool = new CLIPool();
+        final Main main = new Main(rsp, cliPool);
+        main.run(args);
+        cliPool.close();
 
-        Mockito.verify(handler).validate();
-        Mockito.verify(handler, Mockito.never()).run(inResponse);
-
-        assertThat(stderr(), containsString("Fake Exception"));
-        assertThat(stdout(), containsString("Usage: remote-cloner [options] [command] [command options]"));
+        return main;
     }
 }

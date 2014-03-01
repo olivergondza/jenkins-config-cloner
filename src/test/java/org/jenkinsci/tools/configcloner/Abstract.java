@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
-import org.jenkinsci.tools.configcloner.handler.Handler;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -37,11 +36,6 @@ public class Abstract extends PowerMockTestCase {
     @AfterMethod
     public void tearDown() {
         cliPool.close();
-    }
-
-    protected Handler dispatch(final String... args) {
-
-        return main.getHandler(args);
     }
 
     protected String stderr() {
