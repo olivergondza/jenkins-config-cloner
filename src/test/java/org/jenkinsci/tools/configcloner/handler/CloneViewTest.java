@@ -6,16 +6,20 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+
 import org.jenkinsci.tools.configcloner.CommandInvoker;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.beust.jcommander.ParameterException;
 
+@RunWith(JUnitParamsRunner.class)
 public class CloneViewTest {
 
-    @Test(dataProvider = "invalidArgs", expectedExceptions = ParameterException.class)
+    @Test(expected = ParameterException.class) @Parameters(method = "invalidArgs")
     public void failWithIncorectArguments(final String[] args) {
 
         final TransferHandler handler = handler(args);
@@ -23,14 +27,12 @@ public class CloneViewTest {
         handler.destinations();
     }
 
-    @DataProvider
     public Object[][] invalidArgs() {
 
         return new String[][][] {
                 // invalid count
                 {{}},
                 {{"http://jenki.ns"}},
-                {{"http://jenki.ns", "http://jenki.ns", "http://jenki.ns"}},
 
                 // same url
                 {{"http://jenki.ns", "http://jenki.ns"}},
@@ -42,7 +44,7 @@ public class CloneViewTest {
         };
     }
 
-    @Test(dataProvider = "validArgs")
+    @Test @Parameters(method = "validArgs")
     public void parseValidDestinations(final String[] args, final ConfigDestination[] dests) {
 
         final TransferHandler handler = handler(args);
@@ -54,7 +56,6 @@ public class CloneViewTest {
         );
     }
 
-    @DataProvider
     public Object[][] validArgs() {
 
         return new Object[][][] {

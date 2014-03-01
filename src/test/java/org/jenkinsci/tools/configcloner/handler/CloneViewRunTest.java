@@ -8,10 +8,10 @@ import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.CommandResponse.Accumulator;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class CloneViewRunTest {
 
@@ -22,7 +22,7 @@ public class CloneViewRunTest {
     private ConfigTransfer config;
     private CloneView handler;
 
-    @BeforeMethod
+    @Before
     public void setUp() {
 
         config = Mockito.mock(ConfigTransfer.class);
