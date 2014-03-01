@@ -26,6 +26,7 @@ package org.jenkinsci.tools.configcloner.handler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import hudson.model.FreeStyleProject;
 import hudson.model.ListView;
@@ -135,6 +136,26 @@ public class RecipeTest {
         assertEquals(0, rsp.returnCode());
         assertNotNull(j.jenkins.getItem("cloned_job"));
         assertNotNull(j.jenkins.getItem("cloned_cloned_job"));
+    }
+
+    @Test
+    public void doNotModifyWehnUsingDryRun() throws Exception {
+
+        j.jenkins.createProject(FreeStyleProject.class, "src_job");
+        j.jenkins.addView(new ListView("src_view"));
+        j.createSlave("src_slave", "label", null);
+
+        String url = j.jenkins.getRootUrl();
+        run("--dry-run", recipe(
+                "clone.job '" + url + "job/src_job', '" + url + "job/dst_job'\n" +
+                "clone.view '" + url + "view/src_view', '" + url + "view/dst_view'\n" +
+                "clone.node '" + url + "computer/src_slave', '" + url + "computer/dst_slave'\n"
+        ));
+
+        assertEquals(0, rsp.returnCode());
+        assertNull(j.jenkins.getItem("dst_job"));
+        assertNull(j.jenkins.getView("dst_view"));
+        assertNull(j.jenkins.getNode("dst_slave"));
     }
 
     private void run(String... args) {
