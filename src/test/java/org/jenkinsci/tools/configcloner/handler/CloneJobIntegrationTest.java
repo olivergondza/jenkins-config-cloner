@@ -1,9 +1,11 @@
 package org.jenkinsci.tools.configcloner.handler;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.jenkinsci.tools.configcloner.handler.Helper.stdoutContains;
+import static org.jenkinsci.tools.configcloner.handler.Helper.succeeded;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import hudson.model.TopLevelItem;
 import hudson.model.FreeStyleProject;
 
@@ -31,7 +33,7 @@ public class CloneJobIntegrationTest {
 
         createFreeStyle("sourceJob", "Job Description");
 
-        assertTrue(command.invoke("job/sourceJob/", "job/destJob1/", "job/destJob2/").succeeded());
+        assertThat(command.invoke("job/sourceJob/", "job/destJob1/", "job/destJob2/"), succeeded());
 
         assertHasDescription("destJob1", "Job Description");
         assertHasDescription("destJob2", "Job Description");
@@ -42,7 +44,7 @@ public class CloneJobIntegrationTest {
 
         createFreeStyle("sourceJob", "Job Description");
 
-        assertTrue(command.invoke("view/AView/job/sourceJob/", "job/destJob/").succeeded());
+        assertThat(command.invoke("view/AView/job/sourceJob/", "job/destJob/"), succeeded());
 
         assertHasDescription("destJob", "Job Description");
     }
@@ -53,7 +55,7 @@ public class CloneJobIntegrationTest {
         createFreeStyle("sourceJob", "Job Description");
         j.createFreeStyleProject("destJob").setDescription("Description to be overwriten");
 
-        assertTrue(command.opts("--force").invoke("job/sourceJob/", "job/destJob/").succeeded());
+        assertThat(command.opts("--force").invoke("job/sourceJob/", "job/destJob/"), succeeded());
 
         assertHasDescription("destJob", "Job Description");
     }
@@ -64,7 +66,7 @@ public class CloneJobIntegrationTest {
         createFreeStyle("sourceJob", "Job Description");
         createFreeStyle("destJob", "Description not to be overwriten");
 
-        assertFalse(command.invoke("job/sourceJob/", "job/destJob/").succeeded());
+        assertThat(command.invoke("job/sourceJob/", "job/destJob/"), not(succeeded()));
 
         assertHasDescription("destJob", "Description not to be overwriten");
     }
@@ -74,7 +76,7 @@ public class CloneJobIntegrationTest {
 
         createFreeStyle("destJob", "Description not to be overwriten");
 
-        assertFalse(command.invoke("job/sourceJob/", "job/destJob/").succeeded());
+        assertThat(command.invoke("job/sourceJob/", "job/destJob/"), not(succeeded()));
 
         assertHasDescription("destJob", "Description not to be overwriten");
     }
@@ -89,7 +91,7 @@ public class CloneJobIntegrationTest {
                 "-e", "s/asdf.hjkl/Project Description/"
         };
 
-        assertTrue(command.opts(opts).invoke("job/sourceJob/", "job/destJob/").succeeded());
+        assertThat(command.opts(opts).invoke("job/sourceJob/", "job/destJob/"), succeeded());
 
         assertHasDescription("destJob", "Project Description");
     }
@@ -104,9 +106,9 @@ public class CloneJobIntegrationTest {
                 .invoke("job/sourceJob", "job/destJob")
         ;
 
-        assertTrue(result.succeeded());
-        assertTrue(result.stdout().contains("-  <description>Job Description</description>"));
-        assertTrue(result.stdout().contains("+  <description>Job DSCR</description>"));
+        assertThat(result, succeeded());
+        assertThat(result, stdoutContains("-  <description>Job Description</description>"));
+        assertThat(result, stdoutContains("+  <description>Job DSCR</description>"));
         assertNull("Destination should not be created", j.jenkins.getItem("DstJob"));
     }
 
@@ -116,7 +118,7 @@ public class CloneJobIntegrationTest {
         createFreeStyle("sourceJob", "Job Description");
         createFreeStyle("destJob", "Dest Job Description");
 
-        assertTrue(command.opts("-n").invoke("job/sourceJob", "job/destJob").succeeded());
+        assertThat(command.opts("-n").invoke("job/sourceJob", "job/destJob"), succeeded());
 
         assertHasDescription("destJob", "Dest Job Description");
     }
@@ -127,7 +129,7 @@ public class CloneJobIntegrationTest {
         createFreeStyle("sourceJob", "Job Description");
         createFreeStyle("existingJob", "");
 
-        assertFalse(command.invoke("job/sourceJob", "job/existingJob", "job/destJob").succeeded());
+        assertThat(command.invoke("job/sourceJob", "job/existingJob", "job/destJob"), not(succeeded()));
 
         assertHasDescription("destJob", "Job Description");
     }
@@ -141,7 +143,7 @@ public class CloneJobIntegrationTest {
                 "-e", "s/ORIGINAL/MODIFIED/", "--expression", "s/MODIFIED/FINAL/"
         ).invoke("job/sourceJob", "job/destJob");
 
-        assertTrue(rsp.succeeded());
+        assertThat(rsp, succeeded());
         assertHasDescription("destJob", "FINAL Description");
     }
 

@@ -1,6 +1,7 @@
 package org.jenkinsci.tools.configcloner;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.Test;
 
@@ -15,6 +16,6 @@ public class ConfigDestinationTest {
 
         final ConfigDestination derived = old.newEntity("master");
 
-        assertEquals(new ConfigDestination("http://localhost:8080", "master"), derived);
+        assertThat(new ConfigDestination("http://localhost:8080", "master"), equalTo(derived));
     }
 }

@@ -23,11 +23,13 @@
  */
 package org.jenkinsci.tools.configcloner.handler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.jenkinsci.tools.configcloner.handler.Helper.stderrContains;
+import static org.jenkinsci.tools.configcloner.handler.Helper.stdoutContains;
+import static org.jenkinsci.tools.configcloner.handler.Helper.succeeded;
 import hudson.model.FreeStyleProject;
 import hudson.model.ListView;
 
@@ -56,16 +58,16 @@ public class RecipeTest {
     public void failIfNotFileProvided() {
 
         run();
-        assertNotEquals(0, rsp.returnCode());
+        assertThat(rsp, not(succeeded()));
     }
 
     @Test @WithoutJenkins
     public void failIfTheFileCanNotBeRead() {
 
         run("there_is_no_such_file.groovy");
-        assertNotEquals(0, rsp.returnCode());
-        assertTrue(rsp.stderr().contains("FileNotFoundException"));
-        assertTrue(rsp.stderr().contains("there_is_no_such_file.groovy"));
+        assertThat(rsp, not(succeeded()));
+        assertThat(rsp, stderrContains("FileNotFoundException"));
+        assertThat(rsp, stderrContains("there_is_no_such_file.groovy"));
     }
 
     @Test @WithoutJenkins
@@ -73,8 +75,8 @@ public class RecipeTest {
 
         run(recipe("println 'text_on_out';"));
 
-        assertEquals(0, rsp.returnCode());
-        assertTrue(rsp.stdout().contains("text_on_out"));
+        assertThat(rsp, succeeded());
+        assertThat(rsp, stdoutContains("text_on_out"));
     }
 
     @Test
@@ -86,20 +88,20 @@ public class RecipeTest {
         run(recipe(
                 "clone.job '" + url + "job/src_job', '" + url + "job/src_job'\n"
         ));
-        assertNotEquals(0, rsp.returnCode());
+        assertThat(rsp, not(succeeded()));
 
         run(recipe(
                 "clone.job '" + url + "job/src_job', '" + url + "job/dst_job'\n" +
                 "clone.job '" + url + "job/src_job', '" + url + "job/dst_job'\n" // fail here
         ));
-        assertNotEquals(0, rsp.returnCode());
+        assertThat(rsp, not(succeeded()));
 
         run(recipe(
                 "clone.job '" + url + "job/src_job', '" + url + "job/src_job'\n" + // fail here
                 "clone.job '" + url + "job/src_job', '" + url + "job/dst_job2'\n"
 
         ));
-        assertNotEquals(0, rsp.returnCode());
+        assertThat(rsp, not(succeeded()));
     }
 
     @Test
@@ -116,10 +118,10 @@ public class RecipeTest {
                 "clone.node '" + url + "computer/src_slave', '" + url + "computer/dst_slave'\n"
         ));
 
-        assertEquals(0, rsp.returnCode());
-        assertNotNull(j.jenkins.getItem("dst_job"));
-        assertNotNull(j.jenkins.getView("dst_view"));
-        assertNotNull(j.jenkins.getNode("dst_slave"));
+        assertThat(rsp, succeeded());
+        assertThat(j.jenkins.getItem("dst_job"), notNullValue());
+        assertThat(j.jenkins.getView("dst_view"), notNullValue());
+        assertThat(j.jenkins.getNode("dst_slave"), notNullValue());
     }
 
     @Test
@@ -136,10 +138,10 @@ public class RecipeTest {
                 "clone.node '" + url + "::src_slave', '" + url + "::dst_slave'\n"
         ));
 
-        assertEquals(0, rsp.returnCode());
-        assertNotNull(j.jenkins.getItem("dst_job"));
-        assertNotNull(j.jenkins.getView("dst_view"));
-        assertNotNull(j.jenkins.getNode("dst_slave"));
+        assertThat(rsp, succeeded());
+        assertThat(j.jenkins.getItem("dst_job"), notNullValue());
+        assertThat(j.jenkins.getView("dst_view"), notNullValue());
+        assertThat(j.jenkins.getNode("dst_slave"), notNullValue());
     }
 
     @Test
@@ -153,9 +155,9 @@ public class RecipeTest {
                 "clone.job '" + url + "job/cloned_job', '" + url + "job/cloned_cloned_job'\n"
         ));
 
-        assertEquals(0, rsp.returnCode());
-        assertNotNull(j.jenkins.getItem("cloned_job"));
-        assertNotNull(j.jenkins.getItem("cloned_cloned_job"));
+        assertThat(rsp, succeeded());
+        assertThat(j.jenkins.getItem("cloned_job"), notNullValue());
+        assertThat(j.jenkins.getItem("cloned_cloned_job"), notNullValue());
     }
 
     @Test
@@ -172,10 +174,10 @@ public class RecipeTest {
                 "clone.node '" + url + "computer/src_slave', '" + url + "computer/dst_slave'\n"
         ));
 
-        assertEquals(0, rsp.returnCode());
-        assertNull(j.jenkins.getItem("dst_job"));
-        assertNull(j.jenkins.getView("dst_view"));
-        assertNull(j.jenkins.getNode("dst_slave"));
+        assertThat(rsp, succeeded());
+        assertThat(j.jenkins.getItem("dst_job"), nullValue());
+        assertThat(j.jenkins.getView("dst_view"), nullValue());
+        assertThat(j.jenkins.getNode("dst_slave"), nullValue());
     }
 
     private void run(String... args) {

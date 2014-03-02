@@ -1,5 +1,9 @@
 package org.jenkinsci.tools.configcloner.handler;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.jenkinsci.tools.configcloner.handler.Helper.stdoutContains;
+import static org.jenkinsci.tools.configcloner.handler.Helper.succeeded;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -36,7 +40,7 @@ public class CloneViewIntegrationTest {
 
         view("SrcView").add(project);
 
-        assertTrue(command.invoke("view/SrcView", "view/DstView1", "view/DstView2").succeeded());
+        assertThat(command.invoke("view/SrcView", "view/DstView1", "view/DstView2"), succeeded());
 
         View dstView1 = j.jenkins.getView("DstView1");
         assertTrue(dstView1.contains(project));
@@ -51,7 +55,7 @@ public class CloneViewIntegrationTest {
         view("DstView1");
         view("DstView2");
 
-        assertTrue(command.opts("-f").invoke("view/SrcView", "view/DstView1", "view/DstView2").succeeded());
+        assertThat(command.opts("-f").invoke("view/SrcView", "view/DstView1", "view/DstView2"), succeeded());
 
         View dstView1 = j.jenkins.getView("DstView1");
         assertTrue(dstView1.contains(project));
@@ -65,7 +69,7 @@ public class CloneViewIntegrationTest {
         view("SrcView").add(project);
         view("DstView");
 
-        assertFalse(command.invoke("view/SrcView", "view/DstView").succeeded());
+        assertThat(command.invoke("view/SrcView", "view/DstView"), not(succeeded()));
 
         View dstView = j.jenkins.getView("DstView");
         assertFalse(dstView.contains(project));
@@ -76,7 +80,7 @@ public class CloneViewIntegrationTest {
 
         view("DstView").add(project);
 
-        assertFalse(command.invoke("view/SrcView", "view/DstView").succeeded());
+        assertThat(command.invoke("view/SrcView", "view/DstView"), not(succeeded()));
 
         View dstView = j.jenkins.getView("DstView");
         assertTrue(dstView.contains(project));
@@ -90,7 +94,7 @@ public class CloneViewIntegrationTest {
         ListView srcView = view("SrcView", group);
         srcView.add(project);
 
-        assertTrue(command.invoke("view/group/view/SrcView", "view/TopLevelView", "view/group/view/NestedView").succeeded());
+        assertThat(command.invoke("view/group/view/SrcView", "view/TopLevelView", "view/group/view/NestedView"), succeeded());
 
         View topLevelView = j.jenkins.getView("TopLevelView");
         assertTrue(topLevelView.contains(project));
@@ -105,7 +109,7 @@ public class CloneViewIntegrationTest {
         view.setIncludeRegex("originalRegex");
         view.add(project);
 
-        assertTrue(command.opts("-e", "s/original/replaced/").invoke("view/SrcView", "view/DstView").succeeded());
+        assertThat(command.opts("-e", "s/original/replaced/").invoke("view/SrcView", "view/DstView"), succeeded());
 
         View dstView = j.jenkins.getView("DstView");
         assertTrue(dstView.contains(project));
@@ -120,9 +124,9 @@ public class CloneViewIntegrationTest {
                 .invoke("view/SrcView", "view/DstView")
         ;
 
-        assertTrue(result.succeeded());
-        assertTrue(result.stdout().contains("-  <includeRegex>^src-</includeRegex>"));
-        assertTrue(result.stdout().contains("+  <includeRegex>^dst-</includeRegex>"));
+        assertThat(result, succeeded());
+        assertThat(result, stdoutContains("-  <includeRegex>^src-</includeRegex>"));
+        assertThat(result, stdoutContains("+  <includeRegex>^dst-</includeRegex>"));
         assertNull("Destination should not be created", j.jenkins.getView("DstView"));
     }
 
@@ -132,7 +136,7 @@ public class CloneViewIntegrationTest {
         view("SrcView").add(project);
         view("DstView");
 
-        assertTrue(command.opts("--force", "--dry-run").invoke("view/SrcView", "view/DstView").succeeded());
+        assertThat(command.opts("--force", "--dry-run").invoke("view/SrcView", "view/DstView"), succeeded());
 
         View dstView = j.jenkins.getView("DstView");
         assertFalse("Destination should not be overwritten", dstView.contains(project));

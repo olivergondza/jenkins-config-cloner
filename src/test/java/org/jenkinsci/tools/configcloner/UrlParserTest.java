@@ -1,6 +1,7 @@
 package org.jenkinsci.tools.configcloner;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,8 +35,8 @@ public class UrlParserTest {
                 .get(0)
         ;
 
-        assertEquals(new URL("http://localhost:4242"), to.jenkins());
-        assertEquals("my-job", to.entity());
+        assertThat(new URL("http://localhost:4242"), equalTo(to.jenkins()));
+        assertThat("my-job", equalTo(to.entity()));
     }
 
     private UrlParser constParser(final String jenkins, final String path) {
