@@ -1,11 +1,11 @@
 package org.jenkinsci.tools.configcloner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.text.IsEmptyString.isEmptyString;
+import static org.jenkinsci.tools.configcloner.handler.Helper.stdoutContains;
+import static org.jenkinsci.tools.configcloner.handler.Helper.succeeded;
 
 import org.jenkinsci.tools.configcloner.CommandResponse.Accumulator;
 import org.jenkinsci.tools.configcloner.handler.Usage;
@@ -32,9 +32,9 @@ public class MainTest {
 
         run("job", "invalid-arg");
 
-        assertThat(rsp.returnCode(), not(equalTo(0)));
+        assertThat(rsp, not(succeeded()));
         assertThat(rsp.stderr(), not(isEmptyString()));
-        assertThat(rsp.stdout(), containsString("Usage: "));
+        assertThat(rsp, stdoutContains("Usage:"));
     }
 
     private Main run(String... args) {

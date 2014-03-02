@@ -37,18 +37,18 @@ import org.jenkinsci.tools.configcloner.CLIPool;
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
 import org.jenkinsci.tools.configcloner.Main;
-
-import com.beust.jcommander.Parameter;
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.Option;
 
 public class Recipe extends Handler {
 
     private final CLIPool cliPool;
 
-    @Parameter(names = {"--dry-run", "-n"}, description = "Do not perform any modifications to any instance")
+    @Option(name = "-n", aliases = {"--dry-run"}, usage = "Do not perform any modifications to any instance")
     private boolean dryRun = false;
 
-    @Parameter(description="Recipe file to be executed", required=true, arity=1)
-    private List<String> recipeFile;
+    @Argument(metaVar = "RECIPE", required = true, usage = "Recipe file to be executed")
+    private String recipe;
 
     private int recipeResult = 0;
 
@@ -63,6 +63,11 @@ public class Recipe extends Handler {
     }
 
     @Override
+    public String description() {
+        return "Evaluate migration recipe";
+    }
+
+    @Override
     public CommandResponse run(CommandResponse response) {
 
         final GroovyShell shell = new GroovyShell(initBinding(
@@ -71,8 +76,8 @@ public class Recipe extends Handler {
 
         try {
 
-            response.out().println("Evaluating recepie " + recipeFile.get(0));
-            shell.evaluate(new File(recipeFile.get(0)));
+            response.out().println("Evaluating recepie " + recipe);
+            shell.evaluate(new File(recipe));
         } catch (CompilationFailedException ex) {
 
             response.err().println(ex.toString());
@@ -124,8 +129,7 @@ public class Recipe extends Handler {
 
         private void run(String name, String... args) {
 
-            final ArrayList<String> effectiveArgs = new ArrayList<String>(args.length + 2);
-            effectiveArgs.add("");
+            final ArrayList<String> effectiveArgs = new ArrayList<String>(args.length + 1);
             effectiveArgs.add(name);
 
             final List<String> commandArgs = Arrays.asList(args);

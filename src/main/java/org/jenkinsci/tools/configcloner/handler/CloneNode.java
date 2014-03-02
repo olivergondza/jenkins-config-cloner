@@ -31,9 +31,6 @@ import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
 import org.jenkinsci.tools.configcloner.UrlParser;
 
-import com.beust.jcommander.Parameters;
-
-@Parameters(commandDescription = "Clone node configuration from <SRC> to <DST>")
 public class CloneNode extends TransferHandler {
 
     public CloneNode(final ConfigTransfer config) {
@@ -96,5 +93,10 @@ public class CloneNode extends TransferHandler {
     @Override
     public String name() {
         return "node";
+    }
+
+    @Override
+    public String description() {
+        return "Clone node configuration from <SRC> to <DST>";
     }
 }

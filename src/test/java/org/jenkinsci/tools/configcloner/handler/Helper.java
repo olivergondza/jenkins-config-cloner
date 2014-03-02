@@ -49,11 +49,9 @@ public class Helper {
         }
 
         @Override protected boolean matchesSafely(Accumulator item, Description desc) {
-            if (match(item, desc)) {
-                dump(item, desc);
-                return true;
-            }
+            if (match(item, desc)) return true;
 
+            dump(item, desc);
             return false;
         }
 
@@ -86,8 +84,8 @@ public class Helper {
 
     private static void dump(Accumulator item, Description mismatchDescription) {
 
-        mismatchDescription.appendText("return code: " + item.returnCode());
-        mismatchDescription.appendText(item.stdout("out > %s"));
+        mismatchDescription.appendText("return code: ").appendValue(item.returnCode()).appendText("\n");
         mismatchDescription.appendText(item.stderr("err > %s"));
+        mismatchDescription.appendText(item.stdout("out > %s"));
     }
 }

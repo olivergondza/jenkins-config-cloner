@@ -23,8 +23,9 @@
  */
 package org.jenkinsci.tools.configcloner;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.jenkinsci.tools.configcloner.handler.CloneJob;
@@ -34,20 +35,18 @@ import org.jenkinsci.tools.configcloner.handler.Handler;
 import org.jenkinsci.tools.configcloner.handler.InvalidUsage;
 import org.jenkinsci.tools.configcloner.handler.Recipe;
 import org.jenkinsci.tools.configcloner.handler.Usage;
-
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 
 public class Main {
 
     private final CommandResponse response;
-    private final JCommander commander = new JCommander();
-    private final Handler usage = new Usage(commander);
-    private final Map<String, Handler> commandMapping = new HashMap<String, Handler>();
+    private final Handler usage = new Usage(this);
+    private final Map<String, Handler> commandMapping = new LinkedHashMap<String, Handler>();
 
     public static void main(final String[] args) {
 
-        final CommandResponse resp = new CommandResponse(System.out, System.err);
+        final CommandResponse resp = CommandResponse.system();
         final CLIPool cliPool = new CLIPool();
         final CommandResponse response = new Main(resp, cliPool).run(args);
 
@@ -56,7 +55,6 @@ public class Main {
     }
 
     public Main(CommandResponse response, CLIPool cliPool) {
-        commander.setProgramName("remote-cloner");
 
         this.response = response;
         setupMapping(cliPool);
@@ -76,40 +74,21 @@ public class Main {
     private void addCommand(final Handler handler) {
 
         commandMapping.put(handler.name(), handler);
-        commander.addCommand(handler.name(), handler);
     }
 
     public CommandResponse run(final String... args) {
 
-        Handler handler;
         try {
 
-            handler = getHandler(args);
-        } catch (final ParameterException ex) {
-
-            handler = new InvalidUsage(commander, ex);
-        }
-
-        runHandler(handler);
-
-        return response;
-    }
-
-    private void runHandler(final Handler handler) {
-
-        try {
-
-            handler.run(response);
-        } catch (final ParameterException ex) {
-
-            assert !(handler instanceof InvalidUsage): "InvalidUsage handler broken";
-
-            runHandler(new InvalidUsage(commander, ex));
+            getHandler(args).run(response);
         } catch (final Exception ex) {
 
             response.err().println(ex.getMessage());
+            usage.run(response);
             response.returnCode(-1);
         }
+
+        return response;
     }
 
     public Map<String, Handler> commandMapping() {
@@ -119,10 +98,22 @@ public class Main {
 
     public Handler getHandler(final String... args) {
 
-        commander.parse(args);
+        if (args.length == 0) return usage;
 
-        final Handler handler = commandMapping.get(commander.getParsedCommand());
+        final Handler handler = commandMapping.get(args[0]);
 
-        return handler != null ? handler : usage;
+        if (handler == null) return usage;
+
+        final CmdLineParser parser = new CmdLineParser(handler);
+
+        try {
+
+            parser.parseArgument(args.length == 0 ? new String[] {} : Arrays.copyOfRange(args, 1, args.length));
+        } catch (CmdLineException ex) {
+
+            return new InvalidUsage(parser, ex);
+        }
+
+        return handler;
     }
 }

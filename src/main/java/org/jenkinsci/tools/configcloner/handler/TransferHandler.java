@@ -25,35 +25,34 @@ package org.jenkinsci.tools.configcloner.handler;
 
 import hudson.Util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
 import org.jenkinsci.tools.configcloner.UrlParser;
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.Option;
 import org.unix4j.Unix4j;
 import org.unix4j.builder.Unix4jCommandBuilder;
-
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
 import difflib.DiffUtils;
 import difflib.Patch;
 
 public abstract class TransferHandler extends Handler {
 
-    @Parameter(description = "[<SRC>] [<DST>...]")
-    private List<String> entities;
+    @Argument(multiValued = true, usage = "[<SRC>] [<DST>...]", metaVar = "URLS")
+    private List<String> entities = new ArrayList<String>();
 
-    @Parameter(names = {"--force", "-f"}, description = "Overwrite target configuration if exists")
+    @Option(name = "-f", aliases = { "--force" }, usage = "Overwrite target configuration if exists")
     protected boolean force = false;
 
-    @Parameter(names = {"--expression", "-e"}, description = "Transform configuration")
-    protected List<String> expressions = Collections.emptyList();
+    @Option(name = "-e", aliases = { "--expression" }, usage = "Transform configuration")
+    protected List<String> expressions = new ArrayList<String>();
 
-    @Parameter(names = {"--dry-run", "-n"}, description = "Do not perform any modifications to any instance")
+    @Option(name = "-n", aliases = { "--dry-run" }, usage = "Do not perform any modifications to any instance")
     protected boolean dryRun = false;
 
     protected TransferHandler(ConfigTransfer config) {
@@ -147,14 +146,14 @@ public abstract class TransferHandler extends Handler {
     }
 
     protected ConfigDestination source() {
-        if (entities == null || entities.size() < 2) throw new ParameterException(
+        if (entities == null || entities.size() < 2) throw new IllegalArgumentException(
                 "Expecting 2 or more positional arguments"
         );
         return urlParser().destination(entities.get(0));
     }
 
     protected List<ConfigDestination> destinations() {
-        if (entities == null || entities.size() < 2) throw new ParameterException(
+        if (entities == null || entities.size() < 2) throw new IllegalArgumentException(
                 "Expecting 2 or more positional arguments"
         );
         return urlParser().pair(source(), entities.subList(1, entities.size()));

@@ -181,8 +181,7 @@ public class RecipeTest {
     }
 
     private void run(String... args) {
-        final ArrayList<String> effectiveArgs = new ArrayList<String>(args.length + 2);
-        effectiveArgs.add("");
+        final ArrayList<String> effectiveArgs = new ArrayList<String>(args.length + 1);
         effectiveArgs.add("recipe");
         effectiveArgs.addAll(Arrays.asList(args));
 
@@ -196,6 +195,7 @@ public class RecipeTest {
 
     private String recipe(String text) throws IOException {
         final File groovy = File.createTempFile("config-cloner", "ReceipeTest");
+        groovy.deleteOnExit();
         final FileWriter writer = new FileWriter(groovy);
         try {
             writer.write(text);

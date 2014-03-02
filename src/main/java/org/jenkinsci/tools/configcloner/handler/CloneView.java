@@ -30,14 +30,11 @@ import java.util.regex.Pattern;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
 import org.jenkinsci.tools.configcloner.UrlParser;
+import org.kohsuke.args4j.Option;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-
-@Parameters(commandDescription = "Clone configuration of views in view from <SRC> to <DST>")
 public class CloneView extends TransferHandler {
 
-    @Parameter(names = {"--recursive", "-r"}, description = "Transfer contained job and views.")
+    @Option(name = "-r", aliases = { "--recursive" }, usage = "Transfer contained job and views.")
     private boolean recursive = false;
 
     public CloneView(final ConfigTransfer config) {
@@ -89,5 +86,10 @@ public class CloneView extends TransferHandler {
     @Override
     public String name() {
         return "view";
+    }
+
+    @Override
+    public String description() {
+        return "Clone configuration of views in view from <SRC> to <DST>";
     }
 }

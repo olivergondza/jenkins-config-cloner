@@ -38,4 +38,6 @@ public abstract class Handler {
     public abstract CommandResponse run(final CommandResponse response);
 
     public abstract String name();
+
+    public abstract String description();
 }

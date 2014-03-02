@@ -29,9 +29,13 @@ import java.io.UnsupportedEncodingException;
 
 public class CommandResponse {
 
-    private int returnCode;
+    private int returnCode = -42;
     private final PrintStream outputStream;
     private final PrintStream errorStream;
+
+    public static CommandResponse system() {
+        return new CommandResponse(System.out, System.err);
+    }
 
     public CommandResponse(final PrintStream out, final PrintStream err) {
 
@@ -121,8 +125,8 @@ public class CommandResponse {
         public void dump(final String operation) {
 
             System.out.println(operation + ": " + returnCode());
-            System.out.print(stdout("out > %s"));
             System.err.print(stderr("err > %s"));
+            System.out.print(stdout("out > %s"));
         }
 
         private String decorate(final ByteArrayOutputStream stream, String pattern) {
@@ -133,6 +137,8 @@ public class CommandResponse {
             }
 
             final String in = asString(stream);
+            if (in.isEmpty()) return "";
+
             final StringBuilder builder = new StringBuilder(in.length());
             for (final String line: asString(stream).split("\n")) {
 

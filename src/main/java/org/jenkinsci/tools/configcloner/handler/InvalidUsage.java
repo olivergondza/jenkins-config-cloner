@@ -24,27 +24,34 @@
 package org.jenkinsci.tools.configcloner.handler;
 
 import org.jenkinsci.tools.configcloner.CommandResponse;
+import org.kohsuke.args4j.CmdLineParser;
 
-import com.beust.jcommander.JCommander;
-
-public class InvalidUsage extends Usage {
+public class InvalidUsage extends Handler {
 
     private final Exception ex;
+    private final CmdLineParser parser;
 
-    public InvalidUsage(final JCommander commander, final Exception ex) {
-        super(commander);
+    public InvalidUsage(final CmdLineParser parser, final Exception ex) {
+        super(null);
         this.ex = ex;
+        this.parser = parser;
     }
 
     @Override
     public CommandResponse run(final CommandResponse response) {
         response.err().println(ex.getMessage());
+        parser.printUsage(response.err());
         response.returnCode(-1);
-        return super.run(response);
+        return response;
     }
 
     @Override
     public String name() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String description() {
         throw new UnsupportedOperationException();
     }
 }

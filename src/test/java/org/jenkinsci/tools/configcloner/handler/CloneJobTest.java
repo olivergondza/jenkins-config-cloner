@@ -14,17 +14,16 @@ import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.beust.jcommander.ParameterException;
-
 @RunWith(JUnitParamsRunner.class)
 public class CloneJobTest {
 
-    @Test(expected = ParameterException.class) @Parameters(method = "invalidArgs")
+    private final CommandInvoker invoker = new CommandInvoker("job");
+
+    @Test(expected = IllegalArgumentException.class) @Parameters(method = "invalidArgs")
     public void failWithIncorectArguments(final String[] args) {
 
-        final TransferHandler handler = handler(args);
-        handler.source();
-        handler.destinations();
+        invoker.args(args);
+        invoker.main().getHandler(invoker.commandArgs()).run(null);
     }
 
     public Object[][] invalidArgs() {
@@ -46,7 +45,8 @@ public class CloneJobTest {
     @Test @Parameters(method = "validArgs")
     public void parseValidDestinations(final String[] args, final ConfigDestination[] dests) {
 
-        final TransferHandler handler = handler(args);
+        invoker.args(args);
+        final TransferHandler handler = (TransferHandler) invoker.main().getHandler(invoker.commandArgs());
 
         assertEquals(dests[0], handler.source());
         assertEquals(
@@ -90,11 +90,5 @@ public class CloneJobTest {
                         dest("http://3.jnk.ns/", "dst2")
                 ),
         };
-    }
-
-    private TransferHandler handler(final String[] args) {
-
-        final CommandInvoker invoker = new CommandInvoker("job").args(args);
-        return (TransferHandler) invoker.main().getHandler(invoker.commandArgs());
     }
 }

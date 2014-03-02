@@ -28,8 +28,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.beust.jcommander.ParameterException;
-
 /**
  * Get Jenkins url and entity name from url
  *
@@ -49,7 +47,7 @@ public abstract class UrlParser {
             ;
         } catch (MalformedURLException ex) {
 
-            throw new ParameterException(ex);
+            throw new IllegalArgumentException(ex);
         }
     }
 
@@ -65,7 +63,7 @@ public abstract class UrlParser {
 
             final ConfigDestination dest = _parseDest(base, url);
 
-            if (dest.equals(base)) throw new ParameterException(
+            if (dest.equals(base)) throw new IllegalArgumentException(
                     "Source and destination is the same url"
             );
 

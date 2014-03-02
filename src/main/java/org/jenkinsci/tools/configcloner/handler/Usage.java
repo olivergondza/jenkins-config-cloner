@@ -23,29 +23,31 @@
  */
 package org.jenkinsci.tools.configcloner.handler;
 
+import java.io.PrintStream;
+
 import org.jenkinsci.tools.configcloner.CommandResponse;
+import org.jenkinsci.tools.configcloner.Main;
+import org.kohsuke.args4j.CmdLineParser;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameters;
-
-@Parameters(commandDescription = "Display usage")
 public class Usage extends Handler {
 
-    private final JCommander commander;
+    private final Main main;
 
-    public Usage(final JCommander commander) {
+    public Usage(final Main main) {
 
         super(null);
-        this.commander = commander;
+        this.main = main;
     }
 
     @Override
     public CommandResponse run(final CommandResponse response) {
-
-        final StringBuilder helpMessage = new StringBuilder();
-        commander.usage(helpMessage);
-
-        response.out().print(helpMessage);
+        response.out().println("Usage: ");
+        for(Handler handler: main.commandMapping().values()) {
+            final PrintStream o = response.out();
+            o.println();
+            o.format("%-10s %s\n", handler.name(), handler.description());
+            new CmdLineParser(handler).printUsage(o);
+        }
 
         return response;
     }
@@ -53,5 +55,10 @@ public class Usage extends Handler {
     @Override
     public String name() {
         return "help";
+    }
+
+    @Override
+    public String description() {
+        return "Print usage";
     }
 }

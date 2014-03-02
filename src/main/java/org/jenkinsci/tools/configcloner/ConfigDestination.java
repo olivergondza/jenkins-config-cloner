@@ -26,8 +26,6 @@ package org.jenkinsci.tools.configcloner;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.beust.jcommander.ParameterException;
-
 public class ConfigDestination {
 
     private final String jenkins;
@@ -108,7 +106,7 @@ public class ConfigDestination {
 
         final String[] chunks = locator.split("::");
 
-        if (chunks.length != 2) throw new ParameterException("Invalid locator syntax");
+        if (chunks.length != 2) throw new IllegalArgumentException("Invalid locator syntax");
 
         return new ConfigDestination(new URL(chunks[0]), chunks[1]);
     }

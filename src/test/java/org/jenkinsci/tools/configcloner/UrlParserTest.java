@@ -9,12 +9,10 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import com.beust.jcommander.ParameterException;
-
 public class UrlParserTest {
 
-    @Test(expected = ParameterException.class)
-    public void sameInstanceShouldBeDisallowed() throws ParameterException {
+    @Test(expected = IllegalArgumentException.class)
+    public void sameInstanceShouldBeDisallowed() {
 
         final ConfigDestination from = new ConfigDestination(
                 "http://localhost:8080", "my-job"
