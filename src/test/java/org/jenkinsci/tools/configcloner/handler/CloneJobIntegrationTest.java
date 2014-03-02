@@ -132,6 +132,19 @@ public class CloneJobIntegrationTest {
         assertHasDescription("destJob", "Job Description");
     }
 
+    @Test
+    public void useLongAndShortOptionAtTheSameTime() {
+
+        createFreeStyle("sourceJob", "ORIGINAL Description");
+
+        final Accumulator rsp = command.opts(
+                "-e", "s/ORIGINAL/MODIFIED/", "--expression", "s/MODIFIED/FINAL/"
+        ).invoke("job/sourceJob", "job/destJob");
+
+        assertTrue(rsp.succeeded());
+        assertHasDescription("destJob", "FINAL Description");
+    }
+
     private FreeStyleProject createFreeStyle(String name, String description) {
 
         try {
