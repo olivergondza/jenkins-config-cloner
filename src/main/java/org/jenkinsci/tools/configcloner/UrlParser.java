@@ -41,7 +41,16 @@ public abstract class UrlParser {
 
     public final ConfigDestination destination(final String stringUrl) {
 
-        return parseDestination(validateUrl(stringUrl));
+        try {
+
+            return stringUrl.contains("::")
+                    ? ConfigDestination.fromString(stringUrl)
+                    : parseDestination(new URL(stringUrl))
+            ;
+        } catch (MalformedURLException ex) {
+
+            throw new ParameterException(ex);
+        }
     }
 
     /**
@@ -72,20 +81,9 @@ public abstract class UrlParser {
 
         final ConfigDestination dest = destination(urlCandidate);
 
-        // We have absolute iditifier
+        // We have absolute identifier
         if (!dest.entity().isEmpty()) return dest;
 
         return dest.newEntity(base.entity());
-    }
-
-    public static URL validateUrl(final String url) {
-
-        try {
-
-            return new URL(url);
-        } catch (final MalformedURLException ex) {
-
-            throw new ParameterException(ex);
-        }
     }
 }

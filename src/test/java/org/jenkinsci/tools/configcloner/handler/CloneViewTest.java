@@ -79,6 +79,16 @@ public class CloneViewTest {
                         dest("http://3.jnk.ns/", "dst2")
                 ),
 
+                map(
+                        "http://1.jnk.ns::src", "http://2.jnk.ns/::dst1",
+                        "http://3.jnk.ns:8080::dst2", "http://3.jnk.ns:8080/::dst3",
+                        "http://3.jnk.ns:8080/path::dst4", "http://3.jnk.ns:8080/path/::dst5"
+                ).to(
+                        dest("http://1.jnk.ns", "src"), dest("http://2.jnk.ns/", "dst1"),
+                        dest("http://3.jnk.ns:8080", "dst2"), dest("http://3.jnk.ns:8080/", "dst3"),
+                        dest("http://3.jnk.ns:8080/path", "dst4"), dest("http://3.jnk.ns:8080/path/", "dst5")
+                ),
+
                 // Parse nested views
                 map("http://1.jnk.ns/jenkins/view/a/view/b", "http://2.jnk.ns/infra/hudson/view/c/view/d/view/e").to(
                         dest("http://1.jnk.ns/jenkins/", "a/b"),

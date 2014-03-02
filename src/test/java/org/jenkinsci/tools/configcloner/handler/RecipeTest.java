@@ -123,6 +123,26 @@ public class RecipeTest {
     }
 
     @Test
+    public void useDoubleColonNotation() throws Exception {
+
+        j.jenkins.createProject(FreeStyleProject.class, "src_job");
+        j.jenkins.addView(new ListView("src_view"));
+        j.createSlave("src_slave", "label", null);
+
+        String url = j.jenkins.getRootUrl();
+        run(recipe(
+                "clone.job '" + url + "::src_job', '" + url + "::dst_job'\n" +
+                "clone.view '" + url + "::src_view', '" + url + "::dst_view'\n" +
+                "clone.node '" + url + "::src_slave', '" + url + "::dst_slave'\n"
+        ));
+
+        assertEquals(0, rsp.returnCode());
+        assertNotNull(j.jenkins.getItem("dst_job"));
+        assertNotNull(j.jenkins.getView("dst_view"));
+        assertNotNull(j.jenkins.getNode("dst_slave"));
+    }
+
+    @Test
     public void runSameCommandRepeatedly() throws IOException {
 
         j.jenkins.createProject(FreeStyleProject.class, "src_job");
