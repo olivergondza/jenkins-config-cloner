@@ -111,11 +111,11 @@ public class RecipeTest {
         j.jenkins.addView(new ListView("src_view"));
         j.createSlave("src_slave", "label", null);
 
-        String url = j.jenkins.getRootUrl();
-        run(recipe(
-                "clone.job '" + url + "job/src_job', '" + url + "job/dst_job'\n" +
-                "clone.view '" + url + "view/src_view', '" + url + "view/dst_view'\n" +
-                "clone.node '" + url + "computer/src_slave', '" + url + "computer/dst_slave'\n"
+        run("-p", "url=" + j.jenkins.getRootUrl(), recipe(
+                "def url = properties.url\n" +
+                "clone.job url+'job/src_job', url+'job/dst_job'\n" +
+                "clone.view url+'view/src_view', url+'view/dst_view'\n" +
+                "clone.node url+'computer/src_slave', url+'computer/dst_slave'\n"
         ));
 
         assertThat(rsp, succeeded());

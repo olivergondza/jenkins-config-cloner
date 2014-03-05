@@ -30,7 +30,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.jenkinsci.tools.configcloner.CLIPool;
@@ -44,11 +47,14 @@ public class Recipe extends Handler {
 
     private final CLIPool cliPool;
 
+    @Argument(metaVar = "RECIPE", required = true, usage = "Recipe file to be executed")
+    private String recipe;
+
     @Option(name = "-n", aliases = {"--dry-run"}, usage = "Do not perform any modifications to any instance")
     private boolean dryRun = false;
 
-    @Argument(metaVar = "RECIPE", required = true, usage = "Recipe file to be executed")
-    private String recipe;
+    @Option(name = "-p", metaVar = "<property>=<value>", usage = "Specify property for a recipe", multiValued = true)
+    private final Map<String, String> properties = new HashMap<String, String>();
 
     private int recipeResult = 0;
 
@@ -95,9 +101,9 @@ public class Recipe extends Handler {
 
         final Binding binding = new Binding();
         binding.setProperty("clone", new Dsl(cliPool, response));
+        binding.setProperty("properties", Collections.unmodifiableMap(properties));
         binding.setProperty("out", response.out());
         binding.setProperty("err", response.err());
-
         return binding;
     }
 
