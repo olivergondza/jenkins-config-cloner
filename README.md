@@ -61,7 +61,7 @@ Clone `my-great-job` from `jnks.old` to `jnks.new/ci` with the same name and to`
 
 - `-f`|`--force` Overwrite destination item if already exists.
 - `-e`|`--expression` Transform XML using sed-like expression.
-- `-n`|`--dry-run` Simulate actual coloning but avoid any modifications to any instance.
+- `-n`|`--dry-run` Simulate actual cloning but avoid any modifications to any instance.
 
 ## Recipes
 
@@ -89,4 +89,4 @@ where `my-migration.groovy` may look like:
 
 Clone commands run from recipe can use all available options for given command.
 
-- `-n`|`--dry-run` Simulate actual coloning but avoid any modifications to any instance.
+- `-n`|`--dry-run` Simulate actual cloning but avoid any modifications to any instance.
