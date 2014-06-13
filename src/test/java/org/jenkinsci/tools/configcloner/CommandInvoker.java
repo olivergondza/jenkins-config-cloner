@@ -3,16 +3,14 @@ package org.jenkinsci.tools.configcloner;
 import hudson.model.User;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 
 public class CommandInvoker {
@@ -99,29 +97,7 @@ public class CommandInvoker {
         }
 
         public String publicKeyString() {
-
-            try {
-                // TODO expose this
-                Method m = UserPropertyImpl.class.getDeclaredMethod(
-                        "getPublicKeySignature", PublicKey.class
-                );
-                m.setAccessible(true);
-
-                return String.format(
-                        "ssh-rsa %s tester@jenkins-ci.org",
-                        (String) m.invoke(null, pair.getPublic())
-                );
-            } catch (NoSuchMethodException ex) {
-                throw new RuntimeException(ex);
-            } catch (SecurityException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalArgumentException ex) {
-                throw new RuntimeException(ex);
-            } catch (InvocationTargetException ex) {
-                throw new RuntimeException(ex);
-            }
+            return new PublicKeySignatureWriter().asString(pair.getPublic());
         }
     }
 
