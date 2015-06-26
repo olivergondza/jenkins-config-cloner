@@ -8,4 +8,4 @@ if [ ! -f "$jar" ]; then
   jar=`ls "$dir"/target/config-cloner-*-jar-with-dependencies.jar`
 fi
 
-java -jar $jar "$@"
+java $JAVA_OPTS -jar $jar "$@"
