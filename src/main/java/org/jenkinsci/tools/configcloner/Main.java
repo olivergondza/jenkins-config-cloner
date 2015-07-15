@@ -83,7 +83,7 @@ public class Main {
             getHandler(args).run(response);
         } catch (final Exception ex) {
 
-            response.err().println(ex.getMessage());
+            ex.printStackTrace(response.err());
             usage.run(response);
             response.returnCode(-1);
         }
