@@ -30,6 +30,11 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Cache CLI connections so they can be reused for multiple requests.
+ *
+ * @author ogondza
+ */
 public class CLIPool {
 
     private final CLIFactory factory;
@@ -42,13 +47,6 @@ public class CLIPool {
 
     public CLIPool(CLIFactory factory) {
         this.factory = factory;
-    }
-
-    public CLIPool add(final URL instance, final CLI connection) {
-
-        pool.put(instance, connection);
-
-        return this;
     }
 
     public void close() {
