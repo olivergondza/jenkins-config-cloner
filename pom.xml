@@ -18,7 +18,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <surefire.useFile>false</surefire.useFile>
-    <jenkins.version>1.538</jenkins.version>
+    <jenkins.version>1.580.3</jenkins.version>
     <surefire.version>2.13</surefire.version>
   </properties>
 

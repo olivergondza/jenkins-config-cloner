@@ -24,27 +24,27 @@
 package org.jenkinsci.tools.configcloner;
 
 import hudson.cli.CLI;
+import hudson.cli.PrivateKeyProvider;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.CheckForNull;
 
 
 public class CLIFactory {
 
-    private String[] keyFiles;
+    private @CheckForNull String[] keyFiles;
 
     /**
      * Use standard location for ssh keys in the system.
      */
     public static CLIFactory system() {
-        return new CLIFactory("~/.ssh/identity", "~/.ssh/id_rsa", "~/.ssh/id_dsa");
+        return new CLIFactory(null);
     }
 
     /**
@@ -54,7 +54,7 @@ public class CLIFactory {
         return new CLIFactory(keyFiles);
     }
 
-    public CLIFactory(String... keyFiles) {
+    public CLIFactory(@CheckForNull String... keyFiles) {
         this.keyFiles = keyFiles;
     }
 
@@ -68,8 +68,7 @@ public class CLIFactory {
             service.authenticate(userKeys);
         } catch (GeneralSecurityException ex) {
 
-            System.out.println("Anonymous access: " + ex.getMessage());
-            ex.printStackTrace();
+            System.out.printf("Anonymous access to %s: %s%n", destination, ex.getMessage());
         }
 
         return service;
@@ -77,65 +76,28 @@ public class CLIFactory {
 
     protected List<KeyPair> userKeys() {
 
-        final List<KeyPair> pairs = new ArrayList<KeyPair>(3);
+        final PrivateKeyProvider provider = new PrivateKeyProvider();
+        if (keyFiles == null) {
+            provider.readFromDefaultLocations();
+            return provider.getKeys();
+        }
 
-        final String home = System.getProperty("user.home");
         for (final String path: keyFiles) {
-
-
-            final File key = new File(path.replaceAll("~", home));
-            if (!key.exists()) continue;
 
             try {
 
-                pairs.add(CLI.loadKey(key));
+                provider.readFrom(new File(path));
             } catch (IOException ex) { // if the PEM file is encrypted
 
-                if (System.console() == null) {
-                    System.err.println("No interactive terminal. Skipping encrypted key " + path);
-                    continue;
-                }
-
-                // Ask for password
-                pairs.add(tryEncryptedFile(key));
+                System.err.println("Failed to load key from " + path);
+                ex.printStackTrace();
             } catch (GeneralSecurityException ex) {
 
-                System.err.println("Failed to load " + key);
-                System.err.println(ex.getMessage());
+                System.err.println("Failed to load key from " + path);
                 ex.printStackTrace();
             }
         }
 
-        return pairs;
-    }
-
-    /**
-     * Call private CLI.tryEncryptedFile
-     *
-     * TODO have this exposed from core
-     */
-    private KeyPair tryEncryptedFile(final File key) {
-
-        try {
-
-            Method m = CLI.class.getDeclaredMethod("tryEncryptedFile", File.class);
-            m.setAccessible(true);
-            return (KeyPair) m.invoke(key, key);
-        } catch (IllegalArgumentException ex) {
-
-            throw new AssertionError(ex);
-        } catch (IllegalAccessException ex) {
-
-            throw new AssertionError(ex);
-        } catch (InvocationTargetException ex) {
-
-            throw new AssertionError(ex);
-        } catch (SecurityException ex) {
-
-            throw new AssertionError(ex);
-        } catch (NoSuchMethodException ex) {
-
-            throw new AssertionError(ex);
-        }
+        return provider.getKeys();
     }
 }
