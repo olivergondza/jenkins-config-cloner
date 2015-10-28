@@ -39,7 +39,7 @@ public class MainTest {
 
     private Main run(String... args) {
 
-        final CLIPool cliPool = new CLIPool();
+        final CLIPool cliPool = new CLIPool(CLIFactory.provided());
         final Main main = new Main(rsp, cliPool);
         main.run(args);
         cliPool.close();

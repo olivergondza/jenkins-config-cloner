@@ -23,9 +23,6 @@
  */
 package org.jenkinsci.tools.configcloner;
 
-import hudson.cli.CLI;
-import hudson.cli.PrivateKeyProvider;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -34,6 +31,9 @@ import java.security.KeyPair;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
+
+import hudson.cli.CLI;
+import hudson.cli.PrivateKeyProvider;
 
 
 public class CLIFactory {
@@ -44,7 +44,7 @@ public class CLIFactory {
      * Use standard location for ssh keys in the system.
      */
     public static CLIFactory system() {
-        return new CLIFactory(null);
+        return new CLIFactory((String[]) null);
     }
 
     /**
@@ -54,7 +54,7 @@ public class CLIFactory {
         return new CLIFactory(keyFiles);
     }
 
-    public CLIFactory(@CheckForNull String... keyFiles) {
+    protected CLIFactory(@CheckForNull String... keyFiles) {
         this.keyFiles = keyFiles;
     }
 

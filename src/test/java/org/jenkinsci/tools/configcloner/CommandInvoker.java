@@ -1,7 +1,5 @@
 package org.jenkinsci.tools.configcloner;
 
-import hudson.model.User;
-
 import java.io.IOException;
 import java.net.URL;
 import java.security.KeyPair;
@@ -12,6 +10,8 @@ import java.util.List;
 
 import org.jenkinsci.main.modules.cli.auth.ssh.PublicKeySignatureWriter;
 import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
+
+import hudson.model.User;
 
 public class CommandInvoker {
 
@@ -64,7 +64,7 @@ public class CommandInvoker {
                    factory.publicKeyString()
             ));
         } catch (NullPointerException ex) {
-            return new CLIPool(); // Not running Jenkins
+            return new CLIPool(CLIFactory.system()); // Not running Jenkins
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

@@ -47,7 +47,7 @@ public class Main {
     public static void main(final String[] args) {
 
         final CommandResponse resp = CommandResponse.system();
-        final CLIPool cliPool = new CLIPool();
+        final CLIPool cliPool = new CLIPool(CLIFactory.system());
         final CommandResponse response = new Main(resp, cliPool).run(args);
 
         cliPool.close();

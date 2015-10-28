@@ -23,12 +23,12 @@
  */
 package org.jenkinsci.tools.configcloner;
 
-import hudson.cli.CLI;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import hudson.cli.CLI;
 
 /**
  * Cache CLI connections so they can be reused for multiple requests.
@@ -40,10 +40,6 @@ public class CLIPool {
     private final CLIFactory factory;
 
     private final Map<URL, CLI> pool = new HashMap<URL, CLI>(2);
-
-    public CLIPool() {
-        this.factory = CLIFactory.system();
-    }
 
     public CLIPool(CLIFactory factory) {
         this.factory = factory;
