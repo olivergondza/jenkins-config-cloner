@@ -29,17 +29,14 @@ import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.Main;
 import org.kohsuke.args4j.CmdLineParser;
 
-public class Usage extends Handler {
+public class Usage implements Handler {
 
     private final Main main;
 
     public Usage(final Main main) {
-
-        super(null);
         this.main = main;
     }
 
-    @Override
     public CommandResponse run(final CommandResponse response) {
         response.out().println("Usage: ");
         for(Handler handler: main.commandMapping().values()) {
@@ -52,12 +49,10 @@ public class Usage extends Handler {
         return response;
     }
 
-    @Override
     public String name() {
         return "help";
     }
 
-    @Override
     public String description() {
         return "Print usage";
     }

@@ -24,20 +24,26 @@
 package org.jenkinsci.tools.configcloner.handler;
 
 import org.jenkinsci.tools.configcloner.CommandResponse;
-import org.jenkinsci.tools.configcloner.ConfigTransfer;
 
-public abstract class Handler {
+/**
+ * CLI sub-command handler.
+ *
+ * @author ogondza
+ */
+public interface Handler {
 
-    protected final ConfigTransfer config;
+    /**
+     * Perform the operation.
+     */
+    CommandResponse run(final CommandResponse response);
 
-    protected Handler(final ConfigTransfer config) {
+    /**
+     * Name the command used on command line.
+     */
+    String name();
 
-        this.config = config;
-    }
-
-    public abstract CommandResponse run(final CommandResponse response);
-
-    public abstract String name();
-
-    public abstract String description();
+    /**
+     * Description for CLI help.
+     */
+    String description();
 }

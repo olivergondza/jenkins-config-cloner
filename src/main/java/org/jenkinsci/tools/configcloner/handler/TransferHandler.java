@@ -23,8 +23,6 @@
  */
 package org.jenkinsci.tools.configcloner.handler;
 
-import hudson.Util;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,8 +38,9 @@ import org.unix4j.builder.Unix4jCommandBuilder;
 
 import difflib.DiffUtils;
 import difflib.Patch;
+import hudson.Util;
 
-public abstract class TransferHandler extends Handler {
+public abstract class TransferHandler implements Handler {
 
     @Argument(multiValued = true, usage = "[<SRC>] [<DST>...]", metaVar = "URLS")
     private List<String> entities = new ArrayList<String>();
@@ -55,8 +54,10 @@ public abstract class TransferHandler extends Handler {
     @Option(name = "-n", aliases = { "--dry-run" }, usage = "Do not perform any modifications to any instance")
     protected boolean dryRun = false;
 
-    protected TransferHandler(ConfigTransfer config) {
-        super(config);
+    protected final ConfigTransfer config;
+
+    protected TransferHandler(final ConfigTransfer config) {
+        this.config = config;
     }
 
     /**
@@ -64,7 +65,6 @@ public abstract class TransferHandler extends Handler {
      *
      * Expects subclasses override *CommandName methods. This can be overriden in case the template is not suitable.
      */
-    @Override
     public CommandResponse run(final CommandResponse response) {
 
         // Get both of these before doing any work to fail validation early.

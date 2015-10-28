@@ -23,9 +23,6 @@
  */
 package org.jenkinsci.tools.configcloner.handler;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,7 +40,10 @@ import org.jenkinsci.tools.configcloner.Main;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
-public class Recipe extends Handler {
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
+public class Recipe implements Handler {
 
     private final CLIPool cliPool;
 
@@ -58,22 +58,21 @@ public class Recipe extends Handler {
 
     private int recipeResult = 0;
 
+    protected final ConfigTransfer config;
+
     public Recipe(ConfigTransfer config, CLIPool cliPool) {
-        super(config);
+        this.config = config;
         this.cliPool = cliPool;
     }
 
-    @Override
     public String name() {
         return "recipe";
     }
 
-    @Override
     public String description() {
         return "Evaluate migration recipe";
     }
 
-    @Override
     public CommandResponse run(CommandResponse response) {
 
         final GroovyShell shell = new GroovyShell(initBinding(

@@ -90,12 +90,10 @@ public class CloneNode extends TransferHandler {
         };
     }
 
-    @Override
     public String name() {
         return "node";
     }
 
-    @Override
     public String description() {
         return "Clone node configuration from <SRC> to <DST>";
     }

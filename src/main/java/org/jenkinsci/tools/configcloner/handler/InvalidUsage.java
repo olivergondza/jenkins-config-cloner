@@ -26,18 +26,16 @@ package org.jenkinsci.tools.configcloner.handler;
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.kohsuke.args4j.CmdLineParser;
 
-public class InvalidUsage extends Handler {
+public class InvalidUsage implements Handler {
 
     private final Exception ex;
     private final CmdLineParser parser;
 
     public InvalidUsage(final CmdLineParser parser, final Exception ex) {
-        super(null);
         this.ex = ex;
         this.parser = parser;
     }
 
-    @Override
     public CommandResponse run(final CommandResponse response) {
         response.err().println(ex.getMessage());
         parser.printUsage(response.err());
@@ -45,12 +43,10 @@ public class InvalidUsage extends Handler {
         return response;
     }
 
-    @Override
     public String name() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public String description() {
         throw new UnsupportedOperationException();
     }

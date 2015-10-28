@@ -79,12 +79,10 @@ public class CloneJob extends TransferHandler {
         };
     }
 
-    @Override
     public String name() {
         return "job";
     }
 
-    @Override
     public String description() {
         return "Clone job configuration from <SRC> to <DST>";
     }

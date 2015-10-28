@@ -83,12 +83,10 @@ public class CloneView extends TransferHandler {
         };
     }
 
-    @Override
     public String name() {
         return "view";
     }
 
-    @Override
     public String description() {
         return "Clone configuration of views in view from <SRC> to <DST>";
     }
