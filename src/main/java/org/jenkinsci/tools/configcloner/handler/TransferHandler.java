@@ -23,9 +23,21 @@
  */
 package org.jenkinsci.tools.configcloner.handler;
 
+import hudson.Util;
+import hudson.cli.NoCheckTrustManager;
+
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
 
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
@@ -38,7 +50,6 @@ import org.unix4j.builder.Unix4jCommandBuilder;
 
 import difflib.DiffUtils;
 import difflib.Patch;
-import hudson.Util;
 
 public abstract class TransferHandler implements Handler {
 
@@ -53,6 +64,22 @@ public abstract class TransferHandler implements Handler {
 
     @Option(name = "-n", aliases = { "--dry-run" }, usage = "Do not perform any modifications to any instance")
     protected boolean dryRun = false;
+    
+    @Option(name = "-i", aliases = { "--insecure" }, usage = "Do not check SSL certificate")
+    private void setInsecure(boolean insecure) throws NoSuchAlgorithmException, KeyManagementException {
+        if (insecure == true) {
+            System.out.println("Skipping HTTPS certificate checks altogether. Note that this is not secure at all.");
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, new TrustManager[]{new NoCheckTrustManager()}, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+            // bypass host name check, too.
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                public boolean verify(String s, SSLSession sslSession) {
+                    return true;
+                }
+            });
+        }
+    }
 
     protected final ConfigTransfer config;
 
