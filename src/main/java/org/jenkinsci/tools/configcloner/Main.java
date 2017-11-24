@@ -23,11 +23,6 @@
  */
 package org.jenkinsci.tools.configcloner;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.jenkinsci.tools.configcloner.handler.CloneJob;
 import org.jenkinsci.tools.configcloner.handler.CloneNode;
 import org.jenkinsci.tools.configcloner.handler.CloneView;
@@ -38,6 +33,11 @@ import org.jenkinsci.tools.configcloner.handler.Usage;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class Main {
 
     private final CommandResponse response;
@@ -47,7 +47,10 @@ public class Main {
     public static void main(final String[] args) {
 
         final CommandResponse resp = CommandResponse.system();
-        final CLIPool cliPool = new CLIPool(CLIFactory.system());
+        String sshKeyLocation = System.getenv("SSH_PRIVATE_KEY");
+        final CLIPool cliPool = new CLIPool(sshKeyLocation == null ?
+                CLIFactory.system() :
+                CLIFactory.provided(new String[]{sshKeyLocation}));
         final CommandResponse response = new Main(resp, cliPool).run(args);
 
         cliPool.close();
@@ -108,7 +111,7 @@ public class Main {
 
         try {
 
-            parser.parseArgument(args.length == 0 ? new String[] {} : Arrays.copyOfRange(args, 1, args.length));
+            parser.parseArgument(args.length == 0 ? new String[]{} : Arrays.copyOfRange(args, 1, args.length));
         } catch (CmdLineException ex) {
 
             return new InvalidUsage(parser, ex);
