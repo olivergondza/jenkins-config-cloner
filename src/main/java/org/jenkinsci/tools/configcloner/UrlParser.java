@@ -35,6 +35,16 @@ import java.util.List;
  */
 public abstract class UrlParser {
 
+    private final boolean ignoreSameJenkins;
+
+    public UrlParser() {
+        this(false);
+    }
+
+    public UrlParser(boolean ignoreSameJenkins) {
+        this.ignoreSameJenkins = ignoreSameJenkins;
+    }
+
     protected abstract ConfigDestination parseDestination(final URL url);
 
     public final ConfigDestination destination(final String stringUrl) {
@@ -63,8 +73,8 @@ public abstract class UrlParser {
 
             final ConfigDestination dest = _parseDest(base, url);
 
-            if (dest.equals(base)) throw new IllegalArgumentException(
-                    "Source and destination is the same url"
+            if (dest.equals(base) && !ignoreSameJenkins) throw new IllegalArgumentException(
+                    "Source and destination is the same url and you are not forcing its override"
             );
 
             urls.add(dest);
