@@ -132,8 +132,8 @@ public abstract class TransferHandler implements Handler {
             if (rsp.succeeded()) {
                 return response.returnCode(0);
             } else {
-                System.err.println("Updating xml failed with stderr:" + rsp.stderr());
-                System.out.println("Updating xml failed with stdout:" + rsp.stdout());
+                response.err().println("Updating xml failed with stderr:" + rsp.stderr());
+                response.err().println("Updating xml failed with stdout:" + rsp.stdout());
             }
         }
 
