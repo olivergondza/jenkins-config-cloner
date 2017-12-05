@@ -50,7 +50,7 @@ public class Main {
         String sshKeyLocation = System.getenv("SSH_PRIVATE_KEY");
         final CLIPool cliPool = new CLIPool(sshKeyLocation == null ?
                 CLIFactory.system() :
-                CLIFactory.provided(new String[]{sshKeyLocation}));
+                CLIFactory.provided(sshKeyLocation));
         final CommandResponse response = new Main(resp, cliPool).run(args);
 
         cliPool.close();
