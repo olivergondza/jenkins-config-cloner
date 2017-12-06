@@ -23,13 +23,13 @@
  */
 package org.jenkinsci.tools.configcloner.handler;
 
-import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
 import org.jenkinsci.tools.configcloner.UrlParser;
+
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CloneJob extends TransferHandler {
 
@@ -60,7 +60,7 @@ public class CloneJob extends TransferHandler {
 
     @Override
     protected UrlParser urlParser() {
-        return new UrlParser() {
+        return new UrlParser(force) {
             @Override
             protected ConfigDestination parseDestination(final URL url) {
 

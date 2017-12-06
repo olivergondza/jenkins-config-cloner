@@ -35,6 +35,16 @@ import java.util.List;
  */
 public abstract class UrlParser {
 
+    private final boolean ignoreSameJenkins;
+
+    public UrlParser() {
+        this(false);
+    }
+
+    public UrlParser(boolean ignoreSameJenkins) {
+        this.ignoreSameJenkins = ignoreSameJenkins;
+    }
+
     protected abstract ConfigDestination parseDestination(final URL url);
 
     public final ConfigDestination destination(final String stringUrl) {
@@ -63,9 +73,16 @@ public abstract class UrlParser {
 
             final ConfigDestination dest = _parseDest(base, url);
 
-            if (dest.equals(base)) throw new IllegalArgumentException(
-                    "Source and destination is the same url"
-            );
+            if (dest.equals(base)) {
+                if (ignoreSameJenkins) { // This functionality might be useful for updating config using sed updates
+                    System.err.println("WARNING: Source and destination is the same url but you are forcing its override"
+                            + "=> you are trying to override the source => Use it carefully. ");
+                } else {
+                    throw new IllegalArgumentException(
+                            "Source and destination is the same url and you are not forcing its override"
+                    );
+                }
+            }
 
             urls.add(dest);
         }

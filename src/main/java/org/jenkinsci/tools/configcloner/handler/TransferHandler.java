@@ -23,22 +23,10 @@
  */
 package org.jenkinsci.tools.configcloner.handler;
 
+import difflib.DiffUtils;
+import difflib.Patch;
 import hudson.Util;
 import hudson.cli.NoCheckTrustManager;
-
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-
 import org.jenkinsci.tools.configcloner.CommandResponse;
 import org.jenkinsci.tools.configcloner.ConfigDestination;
 import org.jenkinsci.tools.configcloner.ConfigTransfer;
@@ -48,8 +36,17 @@ import org.kohsuke.args4j.Option;
 import org.unix4j.Unix4j;
 import org.unix4j.builder.Unix4jCommandBuilder;
 
-import difflib.DiffUtils;
-import difflib.Patch;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
 
 public abstract class TransferHandler implements Handler {
 
@@ -132,7 +129,12 @@ public abstract class TransferHandler implements Handler {
                     destination, xmlString, this.updateCommandName(), destJob
             );
 
-            if (rsp.succeeded()) return response.returnCode(0);
+            if (rsp.succeeded()) {
+                return response.returnCode(0);
+            } else {
+                response.err().println("Updating xml failed with stderr:" + rsp.stderr());
+                response.err().println("Updating xml failed with stdout:" + rsp.stdout());
+            }
         }
 
         return response.merge(
