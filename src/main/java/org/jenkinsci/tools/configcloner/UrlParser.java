@@ -73,9 +73,16 @@ public abstract class UrlParser {
 
             final ConfigDestination dest = _parseDest(base, url);
 
-            if (dest.equals(base) && !ignoreSameJenkins) throw new IllegalArgumentException(
-                    "Source and destination is the same url and you are not forcing its override"
-            );
+            if (dest.equals(base)) {
+                if (ignoreSameJenkins) { // This functionality might be useful for updating config using sed updates
+                    System.err.println("WARNING: Source and destination is the same url but you are forcing its override"
+                            + "=> you are trying to override the source => Use it carefully. ");
+                } else {
+                    throw new IllegalArgumentException(
+                            "Source and destination is the same url and you are not forcing its override"
+                    );
+                }
+            }
 
             urls.add(dest);
         }
