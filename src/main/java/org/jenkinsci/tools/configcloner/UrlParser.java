@@ -35,14 +35,14 @@ import java.util.List;
  */
 public abstract class UrlParser {
 
-    private final boolean ignoreSameJenkins;
+    private final boolean overwriteExisting;
 
     public UrlParser() {
         this(false);
     }
 
-    public UrlParser(boolean ignoreSameJenkins) {
-        this.ignoreSameJenkins = ignoreSameJenkins;
+    public UrlParser(boolean overwriteExisting) {
+        this.overwriteExisting = overwriteExisting;
     }
 
     protected abstract ConfigDestination parseDestination(final URL url);
@@ -74,12 +74,11 @@ public abstract class UrlParser {
             final ConfigDestination dest = _parseDest(base, url);
 
             if (dest.equals(base)) {
-                if (ignoreSameJenkins) { // This functionality might be useful for updating config using sed updates
-                    System.err.println("WARNING: Source and destination is the same url but you are forcing its override"
-                            + "=> you are trying to override the source => Use it carefully. ");
+                if (overwriteExisting) { // This functionality might be useful for updating config using sed updates
+                    System.err.println("Source and destination represent the same entity: " + url);
                 } else {
                     throw new IllegalArgumentException(
-                            "Source and destination is the same url and you are not forcing its override"
+                            "Source and destination represent the same entity: " + url + ". Use --force to override."
                     );
                 }
             }
